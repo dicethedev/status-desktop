@@ -302,6 +302,14 @@ QtObject:
         # we don't need to reload the messages for archives older than 7 days
         self.handleMessagesReload(receivedData.communityId)
 
+    self.events.on(SignalType.DownloadingHistoryArchivesFinished.event) do(e: Args):
+      var receivedData = HistoryArchivesSignal(e)
+      self.handleMessagesReload(receivedData.communityId)
+
+    self.events.on(SignalType.DiscordCommunityImportFinished.event) do(e: Args):
+      var receivedData = DiscordCommunityImportFinishedSignal(e)
+      self.handleMessagesReload(receivedData.communityId)
+
   proc initialMessagesFetched(self: Service, chatId: string): bool =
     return self.msgCursor.hasKey(chatId)
 

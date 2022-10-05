@@ -306,8 +306,8 @@ QtObject:
       var receivedData = HistoryArchivesSignal(e)
       if  now().toTime().toUnix()-receivedData.begin <= WEEK_AS_MILLISECONDS:
         # we don't need to reload the messages for archives older than 7 days
+        echo "LOAD ARCHIVED MESSAGES"
         self.handleMessagesReload(receivedData.communityId)
-      self.handleMessagesReload(receivedData.communityId)
 
     self.events.on(SignalType.DiscordCommunityImportFinished.event) do(e: Args):
       var receivedData = DiscordCommunityImportFinishedSignal(e)
@@ -432,6 +432,7 @@ QtObject:
       self.events.emit(SIGNAL_MESSAGES_LOADED, data)
       return
 
+    echo "ASYNC LOAD MORE MESSAGES"
     let arg = AsyncFetchChatMessagesTaskArg(
       tptr: cast[ByteAddress](asyncFetchChatMessagesTask),
       vptr: cast[ByteAddress](self.vptr),
@@ -451,6 +452,7 @@ QtObject:
     if(self.getCurrentMessageCursor(chatId).len > 0):
       return
 
+    echo "LOAD INITIAL MESSAGES"
     # we're here if initial messages are not loaded yet
     self.asyncLoadMoreMessagesForChat(chatId)
 

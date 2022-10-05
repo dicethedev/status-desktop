@@ -123,4 +123,6 @@ proc historyArchiveDownloadedFromEvent*(T: type HistoryArchivesSignal, event: Js
 proc downloadingHistoryArchivesFinishedFromEvent*(T: type HistoryArchivesSignal, event: JsonNode): HistoryArchivesSignal =
   result = HistoryArchivesSignal()
   result.communityId = event["event"]{"communityId"}.getStr()
+  result.begin = event["event"]{"from"}.getInt()
+  result.to = event["event"]{"to"}.getInt()
   result.signalType = SignalType.DownloadingHistoryArchivesFinished

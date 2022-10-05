@@ -296,14 +296,17 @@ QtObject:
       if (receivedData.emojiReactions.len > 0):
         self.handleEmojiReactionsUpdate(receivedData.emojiReactions)
 
-    self.events.on(SignalType.HistoryArchiveDownloaded.event) do(e: Args):
+    # self.events.on(SignalType.HistoryArchiveDownloaded.event) do(e: Args):
+    #   var receivedData = HistoryArchivesSignal(e)
+    #   if  now().toTime().toUnix()-receivedData.begin <= WEEK_AS_MILLISECONDS:
+    #     # we don't need to reload the messages for archives older than 7 days
+    #     self.handleMessagesReload(receivedData.communityId)
+
+    self.events.on(SignalType.DownloadingHistoryArchivesFinished.event) do(e: Args):
       var receivedData = HistoryArchivesSignal(e)
       if  now().toTime().toUnix()-receivedData.begin <= WEEK_AS_MILLISECONDS:
         # we don't need to reload the messages for archives older than 7 days
         self.handleMessagesReload(receivedData.communityId)
-
-    self.events.on(SignalType.DownloadingHistoryArchivesFinished.event) do(e: Args):
-      var receivedData = HistoryArchivesSignal(e)
       self.handleMessagesReload(receivedData.communityId)
 
     self.events.on(SignalType.DiscordCommunityImportFinished.event) do(e: Args):

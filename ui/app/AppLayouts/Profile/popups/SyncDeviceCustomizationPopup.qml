@@ -50,7 +50,7 @@ StatusDialog {
                 text: qsTr("Done")
                 enabled: nameInput.text !== ""
                 onClicked : {
-                    root.devicesStore.setName(nameInput.text.trim())
+                    root.devicesStore.setInstallationName(root.deviceModel.installationId, nameInput.text.trim())
                     root.close();
                 }
             }

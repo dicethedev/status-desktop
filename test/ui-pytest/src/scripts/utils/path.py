@@ -9,9 +9,6 @@ class Path(pathlib.Path):
     _accessor = None
     _flavour = pathlib._windows_flavour if os.name == 'nt' else pathlib._posix_flavour  # noqa
 
-    def __new__(cls, *args, **kwargs):
-        return super().__new__(pathlib.WindowsPath if os.name == 'nt' else pathlib.PosixPath, *args, **kwargs)
-
     def rmtree(self, ignore_errors=False):
         children = list(self.iterdir())
         for child in children:

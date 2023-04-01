@@ -3,12 +3,14 @@ import logging
 import pytest
 
 from src.scripts.tools.squish_api import squish_server
+from src.scripts.utils import fabricates
 
 _logger = logging.getLogger(__name__)
 
 
 @pytest.fixture(scope='session')
 def server():
+    _logger.info(fabricates.generate_log_title('Setup session: Squish server'))
     squish_server.stop()
     attempt = 3
     while True:

@@ -1,5 +1,6 @@
 import os
-from pathlib import Path
+
+from src.scripts.utils.path import Path
 
 CURSOR_ANIMATION = int(os.getenv('CURSOR_ANIMATION', 0))
 

@@ -40,7 +40,7 @@ def kill_process_by_name(process_name: str, verify: bool = True, timeout_sec: in
     processes = find_process_by_name(process_name)
     for process in processes:
         os.kill(process.pid, signal.SIGKILL)
-    if verify:
+    if verify and processes:
         wait_for_close(process_name, timeout_sec)
 
 

@@ -10,3 +10,5 @@
 
 # Test:
 - install requirements
+- pytest ./tests/test_self.py
+

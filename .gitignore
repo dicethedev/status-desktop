@@ -101,3 +101,5 @@ build/
 *.out
 *.app
 nimbus-build-system.paths
+
+test/ui-pytest/squish_server.ini

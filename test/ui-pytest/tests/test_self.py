@@ -1,5 +1,5 @@
-import squishtest
+import squish
 
 
-def test_import_squish():
-    pass
+def test_import_squish(server):
+    squish.snooze(0.1)

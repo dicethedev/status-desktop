@@ -35,12 +35,12 @@ def find_process_by_name(process_name: str):
     return processes
 
 
-def kill_process_by_name(process_name: str, validate: bool = True, timeout_sec: int = 10):
+def kill_process_by_name(process_name: str, verify: bool = True, timeout_sec: int = 10):
     _logger.info(f'Closing process: {process_name}')
     processes = find_process_by_name(process_name)
     for process in processes:
         os.kill(process.pid, signal.SIGKILL)
-    if validate:
+    if verify:
         wait_for_close(process_name, timeout_sec)
 
 

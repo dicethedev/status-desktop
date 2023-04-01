@@ -1,5 +1,5 @@
 import squish
 
 
-def test_import_squish(server):
-    squish.snooze(0.1)
+def test_import_squish(login_window):
+    squish.snooze(1)

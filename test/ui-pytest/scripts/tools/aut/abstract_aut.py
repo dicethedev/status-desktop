@@ -4,7 +4,7 @@ from abc import ABC
 import squish
 
 import configs
-from src.scripts.tools.squish_api import context
+from scripts.tools.squish_api import context
 
 _logger = logging.getLogger(__name__)
 

@@ -4,8 +4,8 @@ from abc import ABC
 import squish
 
 import configs
-from src.scripts.tools.aut.abstract_aut import AbstractAut
-from src.scripts.tools.squish_api import remote_system, squish_server
+from scripts.tools.aut.abstract_aut import AbstractAut
+from scripts.tools.squish_api import squish_server, remote_system
 
 _logger = logging.getLogger(__name__)
 

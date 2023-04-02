@@ -2,8 +2,8 @@ import logging
 
 import pytest
 
-from src.scripts.tools.squish_api import squish_server
-from src.scripts.utils import fabricates
+from scripts.tools.squish_api import squish_server
+from scripts.utils import fabricates
 
 _logger = logging.getLogger(__name__)
 

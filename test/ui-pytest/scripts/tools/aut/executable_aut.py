@@ -4,10 +4,10 @@ from abc import ABC
 import squish
 
 import configs
-from src.scripts.tools.aut.abstract_aut import AbstractAut
-from src.scripts.tools.squish_api import squish_server
-from src.scripts.utils import local_system
-from src.scripts.utils.path import Path
+from scripts.tools.aut.abstract_aut import AbstractAut
+from scripts.tools.squish_api import squish_server
+from scripts.utils import local_system
+from scripts.utils.path import Path
 
 _logger = logging.getLogger(__name__)
 

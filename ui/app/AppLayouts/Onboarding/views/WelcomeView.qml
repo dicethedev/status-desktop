@@ -93,6 +93,7 @@ Item {
 
         StatusFlatButton {
             id: btnExistingUser
+            objectName: "welcomeViewIAlreadyUseStatusButton"
             text: qsTr("I already use Status")
             anchors.top: btnNewUser.bottom
             anchors.topMargin: Style.current.bigPadding

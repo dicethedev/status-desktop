@@ -1,8 +1,8 @@
 import typing
 
 import configs
-from src.scripts.tools.squish_api import remote_system
-from src.scripts.utils import local_system
+from scripts.tools.squish_api import remote_system
+from scripts.utils import local_system
 
 _CONFIG_FILE = configs.path.ROOT / 'squish_server.ini'
 _PROCESS_NAME = '_squishserver'

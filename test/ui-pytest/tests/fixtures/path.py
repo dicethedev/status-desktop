@@ -4,8 +4,8 @@ import re
 import pytest
 
 import configs
-from src.scripts.utils import fabricates
-from src.scripts.utils.path import Path
+from scripts.utils import fabricates
+from scripts.utils.path import Path
 
 _logger = logging.getLogger(__name__)
 

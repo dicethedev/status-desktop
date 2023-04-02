@@ -1,12 +1,12 @@
 import logging
 
 import pytest
-import squishtest  # noqa   # First Squish Inicialisation
+import squishtest  # noqa   # First Squish Initialisation
 
 import configs
-from src.scripts.tools.squish_api import context
-from src.scripts.utils import fabricates
-from src.scripts.utils.path import Path
+from scripts.tools.squish_api import context
+from scripts.utils import fabricates
+from scripts.utils.path import Path
 from tests.fixtures.aut import close_all_aut
 from tests.fixtures.path import generate_test_info
 

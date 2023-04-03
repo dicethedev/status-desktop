@@ -6,7 +6,7 @@ _logger = logging.getLogger(__name__)
 
 
 class Path(pathlib.Path):
-    _accessor = None
+    _accessor = pathlib._normal_accessor  # noqa
     _flavour = pathlib._windows_flavour if os.name == 'nt' else pathlib._posix_flavour  # noqa
 
     def rmtree(self, ignore_errors=False):

@@ -44,10 +44,13 @@ class PyElement:
 
     @property
     def is_visible(self) -> bool:
-        return self.object.visible
+        try:
+            return self.object.visible
+        except LookupError:
+            return False
 
     def wait_until_appears(self, timeout_sec: int = configs.squish.UI_LOAD_TIMEOUT_SEC) -> 'PyElement':
-        assert squish.waitFor(lambda: self.is_visible, timeout_sec * 1000)
+        assert squish.waitFor(lambda: self.exists, timeout_sec * 1000)
         return self
 
     def wait_until_hidden(self, timeout_sec: int = configs.squish.UI_LOAD_TIMEOUT_SEC):
@@ -65,4 +68,3 @@ class PyElement:
             y or self.height // 2,
             button or squish.MouseButton.LeftButton
         )
-

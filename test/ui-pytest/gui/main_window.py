@@ -1,8 +1,13 @@
+import logging
+
 from gui.objects_map import main_window_names as names
 from gui.screens.onboarding import WelcomeScreen
+from gui.screens.settings import SettingsScreen
 from gui.wrappers.py_button import PyButton
 from gui.wrappers.py_element import PyElement
 from gui.wrappers.py_window import PyWindow
+
+_logger = logging.getLogger(__name__)
 
 
 class NavigationPanel(PyElement):
@@ -14,17 +19,20 @@ class NavigationPanel(PyElement):
         self._wallet_button = PyButton(names.wallet_navbar_StatusNavBarTabButton)
         self._settings_button = PyButton(names.settings_navbar_StatusNavBarTabButton)
 
-    def open_message_screen(self):
+    def open_message(self):
         self._messages_button.click()
 
-    def open_communities_screen(self):
+    def open_communities_portal(self):
         self._communities_portal_button.click()
 
-    def open_wallet_screen(self):
+    def open_wallet(self):
         self._wallet_button.click()
 
-    def open_settings_screen(self):
+    def open_settings(self):
         self._settings_button.click()
+        settings = SettingsScreen().wait_until_appears()
+        _logger.info('Settings screen open')
+        return settings
 
 
 class MainWindow(PyWindow):

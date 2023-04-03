@@ -108,7 +108,6 @@ class ConfirmPasswordView(OnboardingBaseScreen):
     def confirm_password(self, value: str):
         self._confirm_password_text_field.text = value
         self._confirm_button.click()
-        pass
 
     def back(self):
         self._back_button.click()

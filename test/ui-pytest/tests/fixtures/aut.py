@@ -5,10 +5,9 @@ import pytest
 import configs
 from constants.user import UserAccount
 from gui.components.before_started_pop_up import BeforeStartedPopUp
-from gui.main_window import MainWindow
+from gui.main_window import MainWindow, NavigationPanel
 from scripts.tools.aut.executable_aut import ExecutableAut
-from scripts.tools.squish_api import squish_server
-from scripts.utils import fabricates
+from scripts.utils import fabricates, local_system
 
 _logger = logging.getLogger(__name__)
 
@@ -34,7 +33,6 @@ def main_window(request, aut: ExecutableAut) -> MainWindow:
     if hasattr(request, 'param'):
         user_account = request.param
         assert isinstance(user_account, UserAccount)
-
         main_window.welcome_screen \
             .get_keys() \
             .generate_new_keys() \
@@ -43,16 +41,12 @@ def main_window(request, aut: ExecutableAut) -> MainWindow:
             .next() \
             .create_password(user_account.password) \
             .confirm_password(user_account.password)
-
+        # Waiting for main window loads
+        NavigationPanel().wait_until_appears(configs.squish.APP_LOAD_TIMEOUT_SEC)
     yield main_window
 
 
 @pytest.fixture(scope='session')
-def terminate_old_processes(aut):
+def terminate_old_processes():
     _logger.info(fabricates.generate_log_title('Setup session: Terminate old processes'))
-    close_all_aut()
-    squish_server.stop()
-
-
-def close_all_aut():
-    ExecutableAut(configs.path.AUT).detach().close()
+    local_system.kill_process_by_name(configs.path.AUT.name)

@@ -5,9 +5,8 @@ import squishtest  # noqa   # First Squish Initialisation
 
 import configs
 from scripts.tools.squish_api import context
-from scripts.utils import fabricates
+from scripts.utils import fabricates, local_system
 from scripts.utils.path import Path
-from tests.fixtures.aut import close_all_aut
 from tests.fixtures.path import generate_test_info
 
 _logger = logging.getLogger(__name__)
@@ -21,8 +20,9 @@ pytest_plugins = [
 
 @pytest.fixture(scope='session', autouse=True)
 def setup_session_scope(
+        terminate_old_processes,
         server,  # prepares squish server config, starts/stops squish server
-        run_dir  # adds test directories, clears temp data, and fills configs
+        run_dir,  # adds test directories, clears temp data, and fills configs
 ):
     _logger.info(fabricates.generate_log_title('Setup session: Done'))
 
@@ -46,7 +46,7 @@ def pytest_exception_interact(node):
 
         # Close test application
         context.detach()
-        close_all_aut()
+        local_system.kill_process_by_name(configs.path.AUT.name)
 
         # TODO: Save application logs
     except Exception as ex:

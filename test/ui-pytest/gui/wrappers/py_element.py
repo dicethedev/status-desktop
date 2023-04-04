@@ -5,6 +5,8 @@ import object
 import squish
 
 import configs
+from scripts.tools.squish_api import dump_objects
+from scripts.utils.path import Path
 
 _logger = logging.getLogger(__name__)
 
@@ -68,3 +70,21 @@ class PyElement:
             y or self.height // 2,
             button or squish.MouseButton.LeftButton
         )
+
+    def hover(
+            self,
+            x: typing.Union[int, squish.UiTypes.ScreenPoint] = None,
+            y: typing.Union[int, squish.UiTypes.ScreenPoint] = None,
+    ):
+        squish.mouseMove(x or self.center.x, y or self.center.y)
+
+    def dump_objects(
+            self,
+            out_file_name: Path = None,
+            recursive: bool = True,
+            depth: int = 1,
+            take_screenshots: bool = True
+    ):
+        configs.path.TEST_ARTIFACTS.mkdir(parents=True, exist_ok=True)
+        out_file_name = str(configs.path.TEST_ARTIFACTS / 'dump.xml') or out_file_name
+        dump_objects.dump_objects_to_file(self.object, out_file_name, recursive, depth, take_screenshots)

@@ -5,7 +5,8 @@ import pytest
 import configs
 from constants.user import UserAccount
 from gui.components.before_started_pop_up import BeforeStartedPopUp
-from gui.main_window import MainWindow, NavigationPanel
+from gui.main_window import MainWindow
+from gui.screens.onboarding import SplashScreen
 from scripts.tools.aut.executable_aut import ExecutableAut
 from scripts.utils import fabricates, local_system
 
@@ -41,8 +42,7 @@ def main_window(request, aut: ExecutableAut) -> MainWindow:
             .next() \
             .create_password(user_account.password) \
             .confirm_password(user_account.password)
-        # Waiting for main window loads
-        NavigationPanel().wait_until_appears(configs.squish.APP_LOAD_TIMEOUT_SEC)
+        SplashScreen().wait_until_hidden()
     yield main_window
 
 

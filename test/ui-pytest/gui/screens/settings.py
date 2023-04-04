@@ -1,3 +1,4 @@
+from gui.components.back_up_your_seed_phrase_pop_up import BackUpYourSeedPhrasePopUp
 from gui.objects_map import settings_names as names
 from gui.wrappers.py_element import PyElement
 
@@ -21,9 +22,9 @@ class MenuPanel(PyElement):
         self._about_item = PyElement(names.o11_ExtraMenuItem_StatusNavigationListItem)
         self._sign_out_quit_item = PyElement(names.o14_ExtraMenuItem_StatusNavigationListItem)
 
-    def back_up_seed_phrase(self):
+    def start_back_up_seed_phrase(self):
         self._back_up_seed_phrase_item.click()
-        return
+        return BackUpYourSeedPhrasePopUp().wait_until_appears()
 
 
 class SettingsScreen(PyElement):

@@ -1,5 +1,6 @@
 from abc import abstractmethod
 
+import configs
 from gui.objects_map import onboarding_names as names
 from gui.wrappers.py_button import PyButton
 from gui.wrappers.py_element import PyElement
@@ -112,3 +113,13 @@ class ConfirmPasswordView(OnboardingBaseScreen):
     def back(self):
         self._back_button.click()
         return CreatePasswordView().wait_until_appears()
+
+
+class SplashScreen(PyElement):
+
+    def __init__(self):
+        super(SplashScreen, self).__init__(names.splashScreen)
+
+    def wait_until_hidden(self, timeout_sec: int = configs.squish.APP_LOAD_TIMEOUT_SEC):
+        self.wait_until_appears()
+        super(SplashScreen, self).wait_until_hidden(timeout_sec)

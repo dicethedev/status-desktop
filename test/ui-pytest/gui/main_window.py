@@ -39,5 +39,9 @@ class MainWindow(PyWindow):
 
     def __init__(self):
         super(MainWindow, self).__init__(names.statusDesktop_mainWindow)
+        self._secure_your_seed_phrase_banner = PyElement(names.secureYourSeedPhraseBanner_ModuleWarning)
         self.welcome_screen = WelcomeScreen()
         self.navigator = NavigationPanel()
+
+    def is_secure_phrase_banner_visible(self):
+        return self._secure_your_seed_phrase_banner.is_visible

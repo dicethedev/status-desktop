@@ -7,8 +7,8 @@ from gui.main_window import MainWindow
 from gui.screens.settings import SettingsScreen
 
 
-# Test Case: https://ethstatus.testrail.net/index.php?/cases/view/123
-@pytest.mark.case(123)
+# Test Case: https://ethstatus.testrail.net/index.php?/cases/view/702389
+@pytest.mark.case(702389)
 @pytest.mark.parametrize('main_window', [UserAccount('tester123', 'TesTEr16843/!@00')], indirect=True)
 def test_backup_seed_phrase(main_window: MainWindow):
     assert main_window.is_secure_phrase_banner_visible()

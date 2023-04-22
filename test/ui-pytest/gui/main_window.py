@@ -27,10 +27,9 @@ class NavigationPanel(BaseElement):
     def open_wallet(self):
         self._wallet_button.click()
 
-    def open_settings(self):
+    def open_settings(self) -> SettingsScreen:
         self._settings_button.click()
         settings = SettingsScreen().wait_until_appears()
-        _logger.info('Settings screen open')
         return settings
 
 

@@ -22,5 +22,27 @@ o13_MainMenuItem_StatusNavigationListItem = {"container": mainWindow_ScrollView,
 o14_ExtraMenuItem_StatusNavigationListItem = {"container": mainWindow_ScrollView, "objectName": "14-ExtraMenuItem", "type": "StatusNavigationListItem", "visible": True}
 o15_MainMenuItem_StatusNavigationListItem = {"container": mainWindow_ScrollView, "objectName": "15-MainMenuItem", "type": "StatusNavigationListItem", "visible": True}
 
+# Profile View
+mainWindow_ProfileSettingsView = {"container": statusDesktop_mainWindow, "objectName": "myProfileSettingsView", "type": "MyProfileSettingsView", "visible": True}
+
+# Messaging View
+mainWindow_MessagingView = {"container": statusDesktop_mainWindow, "type": "MessagingView", "unnamed": 1, "visible": True}
+contacts_listItem_btn = {"container": mainWindow_MessagingView, "objectName": "MessagingView_ContactsListItem_btn", "type": "StatusContactRequestsIndicatorListItem"}
+
+# ContactsView
+mainWindow_ContactsView = {"container": statusDesktop_mainWindow, "type": "ContactsView", "unnamed": 1, "visible": True}
+contact_request_to_chat_key_btn = {"container": mainWindow_ContactsView, "objectName": "ContactsView_ContactRequest_Button", "type": "StatusButton"}
+contactRequest_PendingRequests_Button = {"container": mainWindow_ContactsView, "objectName": "ContactsView_PendingRequest_Button", "type": "StatusTabButton"}
+sentRequests_ContactsListPanel = {"container": mainWindow_ContactsView, "objectName": "sentRequests_ContactsListPanel", "type": "ContactsListPanel"}
+sentRequests_contactListPanel_ListView = {"container": sentRequests_ContactsListPanel, "objectName": "ContactListPanel_ListView", "type": "StatusListView"}
+
+
+
+mainWindow_profileContainer_StackLayout = {"container": statusDesktop_mainWindow, "id": "profileContainer", "type": "StackLayout", "unnamed": 1, "visible": True}
+
+mainWindow_keycardView_Loader = {"container": statusDesktop_mainWindow, "id": "keycardView", "type": "Loader", "unnamed": 1, "visible": True}
+mainWindow_AppearanceView = {"container": statusDesktop_mainWindow, "type": "AppearanceView", "unnamed": 1, "visible": True}
+
 # Wallet View
 mainWindow_WalletView = {"container": mainWindow_StatusScrollView, "type": "WalletView", "unnamed": 1, "visible": True}
+

@@ -29,3 +29,16 @@ def test_backup_seed_phrase(main_window: MainWindow):
     back_up_seed_phrase_popup.complete()
     assert squish.waitFor(lambda: not main_window.is_secure_phrase_banner_visible(),
                           configs.squish.UI_LOAD_TIMEOUT_MSEC * 1000)
+
+
+# Test Case: https://ethstatus.testrail.net/index.php?/cases/view/703011
+@pytest.mark.case(703011)
+@pytest.mark.parametrize('main_window', [UserAccount('tester123', 'TesTEr16843/!@00')], indirect=True)
+@pytest.mark.parametrize('chat_key, who_you_are', [
+    ('zQ3shQihZMmciZWUrjvsY6kUoaqSKp9DFSjMPRkkKGty3XCKZ', 'I am a fellow tester')
+])
+def test_add_contact_with_chat_key(main_window: MainWindow, chat_key, who_you_are):
+    settings = main_window.navigator.open_settings()
+    contact_settings = settings.menu_panel.open_messaging_settings().open_contacts_settings()
+    contact_settings.add_contact_by_chat_key(chat_key, who_you_are)
+    assert chat_key in contact_settings.pending_requests

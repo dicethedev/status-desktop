@@ -28,4 +28,4 @@ def test_backup_seed_phrase(main_window: MainWindow):
     back_up_seed_phrase_popup.i_acknowledge = True
     back_up_seed_phrase_popup.complete()
     assert squish.waitFor(lambda: not main_window.is_secure_phrase_banner_visible(),
-                          configs.squish.UI_LOAD_TIMEOUT_SEC * 1000)
+                          configs.squish.UI_LOAD_TIMEOUT_MSEC * 1000)

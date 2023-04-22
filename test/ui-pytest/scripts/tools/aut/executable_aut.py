@@ -38,7 +38,7 @@ class ExecutableAut(AbstractAut, ABC):
         else:
             args = ' '.join(self.start_command_args + [self.aut_id])
             self.ctx = squish.startApplication(args)
-            assert squish.waitFor(lambda: self.ctx.isRunning, configs.squish.APP_LOAD_TIMEOUT_SEC)
+            assert squish.waitFor(lambda: self.ctx.isRunning, configs.squish.APP_LOAD_TIMEOUT_MSEC)
 
     def close(self):
         local_system.kill_process_by_name(self.aut_id)

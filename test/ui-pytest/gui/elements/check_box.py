@@ -1,13 +1,13 @@
 import squish
 
 import configs.squish
-from gui.wrappers.py_element import PyElement
+from gui.elements.base_element import BaseElement
 
 
-class PyCheckBox(PyElement):
+class CheckBox(BaseElement):
 
     def set(self, value: bool, x: int = None, y: int = None):
         if self.is_checked is not value:
             self.click(x, y)
             assert squish.waitFor(
-                lambda: self.is_checked is value, configs.squish.UI_LOAD_TIMEOUT_SEC * 1000), 'Value not changed'
+                lambda: self.is_checked is value, configs.squish.UI_LOAD_TIMEOUT_MSEC * 1000), 'Value not changed'

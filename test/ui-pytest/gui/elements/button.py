@@ -2,10 +2,10 @@ import typing
 
 import squish
 
-from gui.wrappers.py_element import PyElement
+from gui.elements.base_element import BaseElement
 
 
-class PyButton(PyElement):
+class Button(BaseElement):
 
     def click(
             self,
@@ -13,7 +13,7 @@ class PyButton(PyElement):
             y: typing.Union[int, squish.UiTypes.ScreenPoint] = None,
             button: squish.MouseButton = None
     ):
-        if hasattr(self.object, 'clicked'):
+        if None not in (x, y, button):
             self.object.clicked()
         else:
-            super(PyButton, self).click(x, y, button)
+            super(Button, self).click(x, y, button)

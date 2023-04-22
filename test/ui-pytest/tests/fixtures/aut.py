@@ -4,9 +4,9 @@ import pytest
 
 import configs
 from constants.user import UserAccount
-from gui.components.before_started_pop_up import BeforeStartedPopUp
+from gui.components.before_started_popup import BeforeStartedPopUp
+from gui.components.splash_screen import SplashScreen
 from gui.main_window import MainWindow
-from gui.screens.onboarding import SplashScreen
 from scripts.tools.aut.executable_aut import ExecutableAut
 from scripts.utils import fabricates, local_system
 
@@ -42,7 +42,7 @@ def main_window(request, aut: ExecutableAut) -> MainWindow:
             .next() \
             .create_password(user_account.password) \
             .confirm_password(user_account.password)
-        SplashScreen().wait_until_hidden()
+        SplashScreen().wait_until_appears().wait_until_hidden(configs.squish.APP_LOAD_TIMEOUT_MSEC)
     yield main_window
 
 

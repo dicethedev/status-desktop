@@ -4,14 +4,14 @@ import squish
 import toplevelwindow
 
 import configs
-from gui.wrappers.py_element import PyElement
+from gui.elements.base_element import BaseElement
 
 _logger = logging.getLogger(__name__)
 
 
-class PyWindow(PyElement):
+class Window(BaseElement):
 
-    def prepare(self) -> 'PyWindow':
+    def prepare(self) -> 'Window':
         self.maximize()
         self.on_top_level()
         return self
@@ -25,8 +25,8 @@ class PyWindow(PyElement):
             except RuntimeError:
                 return False
 
-        assert squish.waitFor(lambda: _maximize(), configs.squish.UI_LOAD_TIMEOUT_SEC * 1000), 'Maximize failed'
-        _logger.info(f'Window is maximized')
+        assert squish.waitFor(lambda: _maximize(), configs.squish.UI_LOAD_TIMEOUT_MSEC * 1000), 'Maximize failed'
+        _logger.info(f'Window {getattr(self.object, "title", "")} is maximized')
 
     def minimize(self):
 
@@ -37,8 +37,8 @@ class PyWindow(PyElement):
             except RuntimeError:
                 return False
 
-        assert squish.waitFor(lambda: _minimize(), configs.squish.UI_LOAD_TIMEOUT_SEC * 1000), 'Minimize failed'
-        _logger.info(f'Window is minimized')
+        assert squish.waitFor(lambda: _minimize(), configs.squish.UI_LOAD_TIMEOUT_MSEC * 1000), 'Minimize failed'
+        _logger.info(f'Window {getattr(self.object, "title", "")} is minimized')
 
     def set_focus(self):
 
@@ -49,8 +49,8 @@ class PyWindow(PyElement):
             except RuntimeError:
                 return False
 
-        assert squish.waitFor(lambda: _set_focus(), configs.squish.APP_LOAD_TIMEOUT_SEC * 1000), 'Set focus failed'
-        _logger.info(f'Window in focus')
+        assert squish.waitFor(lambda: _set_focus(), configs.squish.APP_LOAD_TIMEOUT_MSEC * 1000), 'Set focus failed'
+        _logger.info(f'Window {getattr(self.object, "title", "")} in focus')
 
     def on_top_level(self):
 
@@ -61,14 +61,14 @@ class PyWindow(PyElement):
             except RuntimeError:
                 return False
 
-        assert squish.waitFor(lambda: _on_top(), configs.squish.UI_LOAD_TIMEOUT_SEC * 1000), 'Set on top failed'
-        _logger.info(f'Window moved on top')
+        assert squish.waitFor(lambda: _on_top(), configs.squish.UI_LOAD_TIMEOUT_MSEC * 1000), 'Set on top failed'
+        _logger.info(f'Window {getattr(self.object, "title", "")} moved on top')
 
     def close(self):
         squish.sendEvent("QCloseEvent", self.object)
 
-    def close_existed(self, timeout_sec: int = 1) -> bool:
-        if self.wait_until_appears(timeout_sec):
+    def close_existed(self) -> bool:
+        if self.existent:
             self.close()
             return True
         return False

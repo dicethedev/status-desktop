@@ -1,31 +1,30 @@
 import typing
 
-from gui.objects_map import component_names as names
-from gui.wrappers.py_button import PyButton
-from gui.wrappers.py_check_box import PyCheckBox
-from gui.wrappers.py_element import PyElement
-from gui.wrappers.py_text_field import PyTextField
+from gui.elements.base_element import BaseElement
+from gui.elements.button import Button
+from gui.elements.check_box import CheckBox
+from gui.elements.text_field import TextEdit
 
 
-class BackUpYourSeedPhrasePopUp(PyElement):
+class BackUpYourSeedPhrasePopUp(BaseElement):
 
     def __init__(self):
-        super(BackUpYourSeedPhrasePopUp, self).__init__(names.o_PopupItem)
-        self._i_have_a_pen_and_paper_check_box = PyCheckBox(names.i_have_a_pen_and_paper_StatusCheckBox)
-        self._i_know_where_i_ll_store_it_check_box = PyCheckBox(names.i_know_where_I_ll_store_it_StatusCheckBox)
-        self._i_am_ready_to_write_down_seed_phrase_check_box = PyCheckBox(names.i_am_ready_to_write_down_StatusCheckBox)
-        self._not_now_button = PyButton(names.not_Now_StatusButton)
-        self._confirm_seed_phrase_button = PyButton(names.confirm_Seed_Phrase_StatusButton)
-        self._reveal_seed_phrase_button = PyButton(names.reveal_seed_phrase_StatusButton)
-        self._blur = PyElement(names.blur_GaussianBlur)
-        self._seed_phrase_panel = PyElement(names.confirmSeedPhrasePanel_StatusSeedPhraseInput)
-        self._first_word_number = PyElement(names.confirmFirstWord)
-        self._first_word_text_field = PyTextField(names.confirmFirstWord_inputText)
-        self._continue_button = PyButton(names.continue_StatusButton)
-        self._second_word_number = PyElement(names.confirmSecondWord)
-        self._second_word_text_field = PyTextField(names.confirmSecondWord_inputText)
-        self._i_acknowledge_check_box = PyCheckBox(names.i_acknowledge_StatusCheckBox)
-        self._complete_button = PyButton(names.completeAndDeleteSeedPhraseButton)
+        super(BackUpYourSeedPhrasePopUp, self).__init__('o_PopupItem')
+        self._i_have_a_pen_and_paper_check_box = CheckBox('i_have_a_pen_and_paper_StatusCheckBox')
+        self._i_know_where_i_ll_store_it_check_box = CheckBox('i_know_where_I_ll_store_it_StatusCheckBox')
+        self._i_am_ready_to_write_down_seed_phrase_check_box = CheckBox('i_am_ready_to_write_down_StatusCheckBox')
+        self._not_now_button = Button('not_Now_StatusButton')
+        self._confirm_seed_phrase_button = Button('confirm_Seed_Phrase_StatusButton')
+        self._reveal_seed_phrase_button = Button('reveal_seed_phrase_StatusButton')
+        self._blur = BaseElement('blur_GaussianBlur')
+        self._seed_phrase_panel = BaseElement('confirmSeedPhrasePanel_StatusSeedPhraseInput')
+        self._first_word_number = BaseElement('confirmFirstWord')
+        self._first_word_text_field = TextEdit('confirmFirstWord_inputText')
+        self._continue_button = Button('continue_StatusButton')
+        self._second_word_number = BaseElement('confirmSecondWord')
+        self._second_word_text_field = TextEdit('confirmSecondWord_inputText')
+        self._i_acknowledge_check_box = CheckBox('i_acknowledge_StatusCheckBox')
+        self._complete_button = Button('completeAndDeleteSeedPhraseButton')
 
     @property
     def i_have_a_pen_and_paper(self) -> bool:
@@ -57,22 +56,19 @@ class BackUpYourSeedPhrasePopUp(PyElement):
 
     @i_acknowledge.setter
     def i_acknowledge(self, value: bool):
-        self._i_acknowledge_check_box.hover()
         self._i_acknowledge_check_box.set(value)
-        pass
 
     def confirm_seed_phrase(self):
         self._confirm_seed_phrase_button.click()
 
     def reveal_seed_phrase(self):
-        self._reveal_seed_phrase_button.hover()
         self._reveal_seed_phrase_button.click()
 
     def get_seed_phrases(self):
         phrases = []
         for phrase_n in range(1, 13):
             object_name = f'ConfirmSeedPhrasePanel_StatusSeedPhraseInput_{phrase_n}'
-            self._seed_phrase_panel.object_name['objectName'] = object_name
+            self._seed_phrase_panel.real_name['objectName'] = object_name
             phrases.append(str(self._seed_phrase_panel.object.textEdit.input.edit.text))
         return phrases
 

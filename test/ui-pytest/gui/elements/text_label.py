@@ -1,7 +1,7 @@
-from gui.wrappers.py_element import PyElement
+from gui.elements.base_element import BaseElement
 
 
-class PyTextLabel(PyElement):
+class TextLabel(BaseElement):
 
     @property
     def text(self) -> str:

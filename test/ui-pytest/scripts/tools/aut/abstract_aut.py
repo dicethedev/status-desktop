@@ -16,6 +16,9 @@ class AbstractAut(ABC):
         self.aut_port = aut_port
         self.ctx = None
 
+    def __str__(self):
+        return type(self).__qualname__
+
     def attach(self, aut_id, timeout_sec: int = configs.squish.PROCESS_TIMEOUT_SEC):
         if self.ctx is None or not self.ctx.isRunning:
             self.ctx = context.attach(aut_id, timeout_sec)

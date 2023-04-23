@@ -1,7 +1,11 @@
+import squish
+
 from gui.components.back_up_your_seed_phrase_popup import BackUpYourSeedPhrasePopUp
 from gui.components.send_contact_request_popup import SendContactRequestPopup
 from gui.elements.base_element import BaseElement
 from gui.elements.button import Button
+from gui.elements.list import List
+from gui.elements.text_field import TextEdit
 
 
 class MenuPanel(BaseElement):
@@ -30,6 +34,10 @@ class MenuPanel(BaseElement):
     def open_messaging_settings(self) -> 'MessagingView':
         self._messaging_item.click()
         return MessagingView().wait_until_appears()
+
+    def open_language_settings(self) -> 'LanguageView':
+        self._language_item.click()
+        return LanguageView().wait_until_appears()
 
 
 class SettingsScreen(BaseElement):
@@ -72,18 +80,36 @@ class ContactsView(BaseSettingsView):
         super(ContactsView, self).__init__('mainWindow_ContactsView')
         self._contact_request_to_chat_key_button = Button('contact_request_to_chat_key_btn')
         self._pending_requests_tab_button = Button('contactRequest_PendingRequests_Button')
-        self._sent_requests_list = BaseElement('sentRequests_contactListPanel_ListView')
+        self._sent_requests_list = List('sentRequests_contactListPanel_ListView')
 
     @property
     def pending_requests(self):
         self._pending_requests_tab_button.click()
-        contact_keys = []
-        contact_list = self._sent_requests_list.object
-        for index in range(contact_list.count):
-            contact = contact_list.itemAtIndex(index)
-            contact_keys.append(str(contact.compressedPk))
-        return contact_keys
+        return self._sent_requests_list.get_values('compressedPk')
 
     def add_contact_by_chat_key(self, chat_key: str, who_you_are: str):
         self._contact_request_to_chat_key_button.click()
         SendContactRequestPopup().fill_form_and_send(chat_key=chat_key, who_you_are=who_you_are)
+
+
+class LanguageView(BaseSettingsView):
+
+    def __init__(self):
+        super(LanguageView, self).__init__('settings_LanguageView')
+        self._language_button = Button('languageView_language_StatusPickerButton')
+        self._language_list = List('languageView_language_ListView')
+        self._search_text_edit = TextEdit('languageView_language_StatusInput')
+
+    @property
+    def language(self) -> str:
+        return str(self._language_button.object.text).strip()
+
+    @language.setter
+    def language(self, value: str):
+        self._language_button.click()
+        self._search_text_edit.text = value
+        for item in self._language_list.items:
+            if getattr(item, 'name', '') == value:
+                squish.mouseClick(item)
+                return self
+        raise LookupError(f'Language: {value} not found in list: {self._language_list.get_values("name")}')

@@ -2,14 +2,15 @@ import pytest
 import squish
 
 import configs.squish
-from constants.user import UserAccount
+from gui.components.before_started_popup import BeforeStartedPopUp
+from gui.components.change_language_popup import ChangeLanguagePopup
 from gui.main_window import MainWindow
 from gui.screens.settings import SettingsScreen
+from scripts.tools.aut.status_aut import StatusAut
 
 
 # Test Case: https://ethstatus.testrail.net/index.php?/cases/view/702389
 @pytest.mark.case(702389)
-@pytest.mark.parametrize('main_window', [UserAccount('tester123', 'TesTEr16843/!@00')], indirect=True)
 def test_backup_seed_phrase(main_window: MainWindow):
     assert main_window.is_secure_phrase_banner_visible()
     settings: SettingsScreen = main_window.navigator.open_settings()
@@ -33,7 +34,6 @@ def test_backup_seed_phrase(main_window: MainWindow):
 
 # Test Case: https://ethstatus.testrail.net/index.php?/cases/view/703011
 @pytest.mark.case(703011)
-@pytest.mark.parametrize('main_window', [UserAccount('tester123', 'TesTEr16843/!@00')], indirect=True)
 @pytest.mark.parametrize('chat_key, who_you_are', [
     ('zQ3shQihZMmciZWUrjvsY6kUoaqSKp9DFSjMPRkkKGty3XCKZ', 'I am a fellow tester')
 ])
@@ -42,3 +42,49 @@ def test_add_contact_with_chat_key(main_window: MainWindow, chat_key, who_you_ar
     contact_settings = settings.menu_panel.open_messaging_settings().open_contacts_settings()
     contact_settings.add_contact_by_chat_key(chat_key, who_you_are)
     assert chat_key in contact_settings.pending_requests
+
+
+# Test Case: https://ethstatus.testrail.net/index.php?/cases/view/703009
+@pytest.mark.case(703009)
+# Each language run takes 30 seconds, so only some of them are enabled until we can parallelize executions
+@pytest.mark.parametrize('language, native', [
+    # ('English', 'English'),
+    ('Arabic', 'العربية'),
+    # ('Bengali', 'বাংলা'),
+    # ('Chinese (China)', '中文（中國)'),
+    # ('Chinese (Taiwan)', '中文（台灣)'),
+    # ('Dutch', 'Nederlands'),
+    # ('French', 'Français'),
+    # ('German', 'Deutsch'),
+    # ('Hindi', 'हिन्दी'),
+    # ('Indonesian', 'Bahasa Indonesia'),
+    # ('Italian', 'Italiano'),
+    # ('Japanese', '日本語'),
+    # ('Korean', '한국어'),
+    # ('Malay', 'Bahasa Melayu'),
+    # ('Polish', 'Polski'),
+    # ('Portuguese', 'Português'),
+    # ('Portuguese (Brazil)', 'Português (Brasil)'),
+    # ('Russian', 'Русский'),
+    # ('Spanish', 'Español'),
+    # ('Spanish (Latin America)', 'Español (Latinoamerica)'),
+    # ('Spanish (Argentina)', 'Español (Argentina)'),
+    # ('Tagalog', 'Tagalog'),
+    # ('Turkish', 'Türkçe')
+])
+def test_search_and_set_language(aut: StatusAut, language, native):
+    main_window: MainWindow = aut.start()
+    BeforeStartedPopUp().get_started()
+    main_window.welcome_screen.sign_up()
+    language_settings = main_window.navigator.open_settings().menu_panel.open_language_settings()
+    language_settings.language = language
+    ChangeLanguagePopup().close_app()
+    aut.detach().wait_for_close()
+
+    main_window: MainWindow = aut.start()
+    main_window.welcome_screen.log_in()
+    language_settings = main_window.navigator.open_settings().menu_panel.open_language_settings()
+    assert language_settings.language == native
+    language_settings.language = 'English'
+    ChangeLanguagePopup().close_app()
+    aut.detach().wait_for_close()

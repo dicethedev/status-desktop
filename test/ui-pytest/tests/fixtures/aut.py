@@ -3,46 +3,38 @@ import logging
 import pytest
 
 import configs
+import constants.user
 from constants.user import UserAccount
 from gui.components.before_started_popup import BeforeStartedPopUp
-from gui.components.splash_screen import SplashScreen
 from gui.main_window import MainWindow
-from scripts.tools.aut.executable_aut import ExecutableAut
+from scripts.tools.aut.status_aut import StatusAut
 from scripts.utils import fabricates, local_system
 
 _logger = logging.getLogger(__name__)
 
 
 @pytest.fixture
-def aut() -> ExecutableAut:
-    _aut = ExecutableAut(configs.path.AUT)
+def aut() -> StatusAut:
+    _aut = StatusAut(configs.path.AUT)
     if not configs.path.AUT.exists():
         pytest.exit(f"Application not found: {configs.path.AUT}")
-
     yield _aut
     _aut.detach()
     _aut.close()
 
 
 @pytest.fixture
-def main_window(request, aut: ExecutableAut) -> MainWindow:
-    aut.start()
-    main_window = MainWindow().wait_until_appears().prepare()
-    # TODO: move to event handler
-    BeforeStartedPopUp().get_started()
-
+def main_window(request, aut: StatusAut) -> MainWindow:
     if hasattr(request, 'param'):
         user_account = request.param
         assert isinstance(user_account, UserAccount)
-        main_window.welcome_screen \
-            .get_keys() \
-            .generate_new_keys() \
-            .set_display_name(user_account.name) \
-            .next() \
-            .next() \
-            .create_password(user_account.password) \
-            .confirm_password(user_account.password)
-        SplashScreen().wait_until_appears().wait_until_hidden(configs.squish.APP_LOAD_TIMEOUT_MSEC)
+    else:
+        user_account = constants.user.user_account_1
+
+    main_window: MainWindow = aut.start()
+    # TODO: move to event handler
+    BeforeStartedPopUp().get_started()
+    main_window.welcome_screen.sign_up(user_account)
     yield main_window
 
 

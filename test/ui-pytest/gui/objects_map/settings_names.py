@@ -29,14 +29,19 @@ mainWindow_ProfileSettingsView = {"container": statusDesktop_mainWindow, "object
 mainWindow_MessagingView = {"container": statusDesktop_mainWindow, "type": "MessagingView", "unnamed": 1, "visible": True}
 contacts_listItem_btn = {"container": mainWindow_MessagingView, "objectName": "MessagingView_ContactsListItem_btn", "type": "StatusContactRequestsIndicatorListItem"}
 
-# ContactsView
+# Contacts View
 mainWindow_ContactsView = {"container": statusDesktop_mainWindow, "type": "ContactsView", "unnamed": 1, "visible": True}
 contact_request_to_chat_key_btn = {"container": mainWindow_ContactsView, "objectName": "ContactsView_ContactRequest_Button", "type": "StatusButton"}
 contactRequest_PendingRequests_Button = {"container": mainWindow_ContactsView, "objectName": "ContactsView_PendingRequest_Button", "type": "StatusTabButton"}
 sentRequests_ContactsListPanel = {"container": mainWindow_ContactsView, "objectName": "sentRequests_ContactsListPanel", "type": "ContactsListPanel"}
 sentRequests_contactListPanel_ListView = {"container": sentRequests_ContactsListPanel, "objectName": "ContactListPanel_ListView", "type": "StatusListView"}
 
-
+# Language View
+settings_LanguageView = {"container": statusDesktop_mainWindow, "objectName": "languageView", "type": "LanguageView"}
+languageView_language_StatusListPicker = {"container": settings_LanguageView, "objectName": "languagePicker", "type": "StatusListPicker"}
+languageView_language_StatusPickerButton = {"container": languageView_language_StatusListPicker,  "type": "StatusPickerButton", "unnamed": 1}
+languageView_language_ListView = {"container": languageView_language_StatusListPicker,  "type": "ListView", "unnamed": 1}
+languageView_language_StatusInput = {"container": languageView_language_ListView, "type": "TextEdit", "unnamed": 1, "visible": True}
 
 mainWindow_profileContainer_StackLayout = {"container": statusDesktop_mainWindow, "id": "profileContainer", "type": "StackLayout", "unnamed": 1, "visible": True}
 

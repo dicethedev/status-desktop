@@ -5,7 +5,7 @@ import pathlib
 _logger = logging.getLogger(__name__)
 
 
-class Path(pathlib.Path):
+class SystemPath(pathlib.Path):
     _accessor = pathlib._normal_accessor  # noqa
     _flavour = pathlib._windows_flavour if os.name == 'nt' else pathlib._posix_flavour  # noqa
 

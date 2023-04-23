@@ -1,8 +1,7 @@
 import logging
 
-from gui.elements.base_element import BaseElement
-from gui.elements.base_window import Window
-from gui.elements.button import Button
+from gui.elements import BaseElement, Button
+from gui.elements.base_window import BaseWindow
 from gui.screens.onboarding import WelcomeScreen
 from gui.screens.settings import SettingsScreen
 
@@ -33,7 +32,7 @@ class NavigationPanel(BaseElement):
         return settings
 
 
-class MainWindow(Window):
+class MainWindow(BaseWindow):
 
     def __init__(self):
         super(MainWindow, self).__init__('statusDesktop_mainWindow')

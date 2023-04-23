@@ -8,7 +8,7 @@ from datetime import datetime
 
 import psutil
 
-import configs
+from . import config
 
 _logger = logging.getLogger(__name__)
 
@@ -44,7 +44,7 @@ def kill_process_by_name(process_name: str, verify: bool = True, timeout_sec: in
         wait_for_close(process_name, timeout_sec)
 
 
-def wait_for_started(process_name: str, timeout_sec: int = configs.squish.PROCESS_TIMEOUT_SEC):
+def wait_for_started(process_name: str, timeout_sec: int = config.PROCESS_TIMEOUT_SEC):
     started_at = time.monotonic()
     while True:
         process = find_process_by_name(process_name)

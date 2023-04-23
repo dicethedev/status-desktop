@@ -1,1 +1,1 @@
-from . import path, squish
+from . import path

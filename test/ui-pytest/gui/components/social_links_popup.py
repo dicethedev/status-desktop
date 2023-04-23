@@ -1,9 +1,9 @@
 import time
 import typing
 
-from gui.elements.base_element import BaseElement
-from gui.elements.button import Button
-from gui.elements.text_field import TextEdit
+from driver.elements.base_element import BaseElement
+from driver.elements import Button
+from driver.elements.text_edit import TextEdit
 
 
 class SocialLinksPopup(BaseElement):

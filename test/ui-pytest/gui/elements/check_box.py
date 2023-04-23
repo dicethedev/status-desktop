@@ -1,7 +1,5 @@
-import squish
-
-import configs.squish
-from gui.elements.base_element import BaseElement
+import driver
+from gui.elements import BaseElement
 
 
 class CheckBox(BaseElement):
@@ -9,5 +7,5 @@ class CheckBox(BaseElement):
     def set(self, value: bool, x: int = None, y: int = None):
         if self.is_checked is not value:
             self.click(x, y)
-            assert squish.waitFor(
-                lambda: self.is_checked is value, configs.squish.UI_LOAD_TIMEOUT_MSEC * 1000), 'Value not changed'
+            assert driver.waitFor(
+                lambda: self.is_checked is value, driver.config.UI_LOAD_TIMEOUT_MSEC), 'Value not changed'

@@ -1,9 +1,6 @@
 import typing
 
-from gui.elements.base_element import BaseElement
-from gui.elements.button import Button
-from gui.elements.check_box import CheckBox
-from gui.elements.text_field import TextEdit
+from gui.elements import BaseElement, CheckBox, Button, TextEdit
 
 
 class BackUpYourSeedPhrasePopUp(BaseElement):

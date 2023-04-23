@@ -1,17 +1,16 @@
 import typing
 
-import squish
-
-from gui.elements.base_element import BaseElement
+import driver
+from gui.elements import BaseElement
 
 
 class Button(BaseElement):
 
     def click(
             self,
-            x: typing.Union[int, squish.UiTypes.ScreenPoint] = None,
-            y: typing.Union[int, squish.UiTypes.ScreenPoint] = None,
-            button: squish.MouseButton = None
+            x: typing.Union[int, driver.UiTypes.ScreenPoint] = None,
+            y: typing.Union[int, driver.UiTypes.ScreenPoint] = None,
+            button: driver.MouseButton = None
     ):
         if None not in (x, y, button):
             self.object.clicked()

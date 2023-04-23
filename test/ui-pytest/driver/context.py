@@ -3,12 +3,12 @@ import time
 
 import squish
 
-import configs
+from driver import config
 
 _logger = logging.getLogger(__name__)
 
 
-def attach(aut_name: str, timeout_sec: int = configs.squish.PROCESS_TIMEOUT_SEC):
+def attach(aut_name: str, timeout_sec: int = config.PROCESS_TIMEOUT_SEC):
     _logger.info(f'Attaching squish to {aut_name}')
     started_at = time.monotonic()
     while True:

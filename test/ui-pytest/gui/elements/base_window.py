@@ -1,71 +1,36 @@
 import logging
 
-import squish
-import toplevelwindow
-
-import configs
-from gui.elements.base_element import BaseElement
+import driver
+from gui.elements import BaseElement
 
 _logger = logging.getLogger(__name__)
 
 
-class Window(BaseElement):
+class BaseWindow(BaseElement):
 
-    def prepare(self) -> 'Window':
+    def prepare(self) -> 'BaseWindow':
         self.maximize()
         self.on_top_level()
         return self
 
     def maximize(self):
-
-        def _maximize() -> bool:
-            try:
-                toplevelwindow.ToplevelWindow(self.object).maximize()
-                return True
-            except RuntimeError:
-                return False
-
-        assert squish.waitFor(lambda: _maximize(), configs.squish.UI_LOAD_TIMEOUT_MSEC * 1000), 'Maximize failed'
+        assert driver.toplevel_window.maximize(self.real_name), 'Maximize failed'
         _logger.info(f'Window {getattr(self.object, "title", "")} is maximized')
 
     def minimize(self):
-
-        def _minimize() -> bool:
-            try:
-                toplevelwindow.ToplevelWindow(self.object).minimize()
-                return True
-            except RuntimeError:
-                return False
-
-        assert squish.waitFor(lambda: _minimize(), configs.squish.UI_LOAD_TIMEOUT_MSEC * 1000), 'Minimize failed'
+        assert driver.toplevel_window.minimize(self.real_name), 'Minimize failed'
         _logger.info(f'Window {getattr(self.object, "title", "")} is minimized')
 
     def set_focus(self):
-
-        def _set_focus() -> bool:
-            try:
-                toplevelwindow.ToplevelWindow(self.object).setFocus()
-                return True
-            except RuntimeError:
-                return False
-
-        assert squish.waitFor(lambda: _set_focus(), configs.squish.APP_LOAD_TIMEOUT_MSEC * 1000), 'Set focus failed'
+        assert driver.toplevel_window.set_focus(self.real_name), 'Set focus failed'
         _logger.info(f'Window {getattr(self.object, "title", "")} in focus')
 
     def on_top_level(self):
-
-        def _on_top() -> bool:
-            try:
-                toplevelwindow.ToplevelWindow(self.object).setForeground()
-                return True
-            except RuntimeError:
-                return False
-
-        assert squish.waitFor(lambda: _on_top(), configs.squish.UI_LOAD_TIMEOUT_MSEC * 1000), 'Set on top failed'
+        assert driver.toplevel_window.on_top_level(self.real_name), 'Set on top failed'
         _logger.info(f'Window {getattr(self.object, "title", "")} moved on top')
 
     def close(self):
-        squish.sendEvent("QCloseEvent", self.object)
+        driver.toplevel_window.close(self.real_name)
 
     def close_existed(self) -> bool:
         if self.existent:

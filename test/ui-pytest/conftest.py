@@ -1,12 +1,9 @@
 import logging
 
 import pytest
-import squishtest  # noqa   # First Squish Initialisation
 
 import configs
-from scripts.tools.squish_api import context
-from scripts.utils import fabricates, local_system
-from scripts.utils.path import Path
+import driver
 from tests.fixtures.path import generate_test_info
 
 _logger = logging.getLogger(__name__)
@@ -14,24 +11,23 @@ _logger = logging.getLogger(__name__)
 pytest_plugins = [
     'tests.fixtures.aut',
     'tests.fixtures.path',
-    'tests.fixtures.squish',
 ]
 
 
 @pytest.fixture(scope='session', autouse=True)
 def setup_session_scope(
         terminate_old_processes,
-        server,  # prepares squish server config, starts/stops squish server
+        server,  # prepares driver server config, starts/stops driver server
         run_dir,  # adds test directories, clears temp data, and fills configs
 ):
-    _logger.info(fabricates.generate_log_title('Setup session: Done'))
+    _logger.info('Setup session: Done')
 
 
 @pytest.fixture(autouse=True)
 def setup_function_scope(
         clear_user_data
 ):
-    _logger.info(fabricates.generate_log_title('Setup function: Done'))
+    _logger.info('Setup function: Done')
 
 
 def pytest_exception_interact(node):
@@ -39,14 +35,14 @@ def pytest_exception_interact(node):
     try:
         # Create test directories
         test_path, test_name, test_params = generate_test_info(node)
-        node_dir: Path = configs.path.RUN / test_path / test_name / test_params
+        node_dir = configs.path.RUN / test_path / test_name / test_params
         node_dir.mkdir(parents=True, exist_ok=True)
 
         # TODO: Grab desktop screenshot
 
         # Close test application
-        context.detach()
-        local_system.kill_process_by_name(configs.path.AUT.name)
+        driver.context.detach()
+        driver.utils.local_system.kill_process_by_name(configs.path.AUT.name)
 
         # TODO: Save application logs
     except Exception as ex:

@@ -1,4 +1,4 @@
-from gui.elements.base_element import BaseElement
+from gui.elements import BaseElement
 
 
 class TextLabel(BaseElement):

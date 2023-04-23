@@ -1,11 +1,8 @@
-import squish
+import driver
 
 from gui.components.back_up_your_seed_phrase_popup import BackUpYourSeedPhrasePopUp
 from gui.components.send_contact_request_popup import SendContactRequestPopup
-from gui.elements.base_element import BaseElement
-from gui.elements.button import Button
-from gui.elements.list import List
-from gui.elements.text_field import TextEdit
+from gui.elements import BaseElement, Button, List, TextEdit
 
 
 class MenuPanel(BaseElement):
@@ -110,6 +107,6 @@ class LanguageView(BaseSettingsView):
         self._search_text_edit.text = value
         for item in self._language_list.items:
             if getattr(item, 'name', '') == value:
-                squish.mouseClick(item)
+                driver.mouseClick(item)
                 return self
         raise LookupError(f'Language: {value} not found in list: {self._language_list.get_values("name")}')

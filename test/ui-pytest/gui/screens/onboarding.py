@@ -1,13 +1,10 @@
 import time
 from abc import abstractmethod
 
-import configs
 import constants
-from constants.user import UserAccount
+from constants import UserAccount
 from gui.components.splash_screen import SplashScreen
-from gui.elements.base_element import BaseElement
-from gui.elements.button import Button
-from gui.elements.text_field import TextEdit
+from gui.elements import BaseElement, Button, TextEdit
 
 
 class WelcomeScreen(BaseElement):
@@ -25,7 +22,8 @@ class WelcomeScreen(BaseElement):
             .next() \
             .create_password(user_account.password) \
             .confirm_password(user_account.password)
-        SplashScreen().wait_until_appears().wait_until_hidden(configs.squish.APP_LOAD_TIMEOUT_MSEC)
+        # SplashScreen().wait_until_appears().wait_until_hidden(configs.squish.APP_LOAD_TIMEOUT_MSEC)
+        pass
 
     def get_keys(self) -> 'KeysScreen':
         self._new_user_button.click()

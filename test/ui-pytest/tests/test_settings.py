@@ -1,12 +1,10 @@
 import pytest
-import squish
 
-import configs.squish
+import driver
 from gui.components.before_started_popup import BeforeStartedPopUp
 from gui.components.change_language_popup import ChangeLanguagePopup
 from gui.main_window import MainWindow
 from gui.screens.settings import SettingsScreen
-from scripts.tools.aut.status_aut import StatusAut
 
 
 # Test Case: https://ethstatus.testrail.net/index.php?/cases/view/702389
@@ -28,8 +26,8 @@ def test_backup_seed_phrase(main_window: MainWindow):
     back_up_seed_phrase_popup.continue_confirmation()
     back_up_seed_phrase_popup.i_acknowledge = True
     back_up_seed_phrase_popup.complete()
-    assert squish.waitFor(lambda: not main_window.is_secure_phrase_banner_visible(),
-                          configs.squish.UI_LOAD_TIMEOUT_MSEC * 1000)
+    assert driver.waitFor(
+        lambda: not main_window.is_secure_phrase_banner_visible(), driver.config.UI_LOAD_TIMEOUT_MSEC)
 
 
 # Test Case: https://ethstatus.testrail.net/index.php?/cases/view/703011
@@ -72,7 +70,7 @@ def test_add_contact_with_chat_key(main_window: MainWindow, chat_key, who_you_ar
     # ('Tagalog', 'Tagalog'),
     # ('Turkish', 'Türkçe')
 ])
-def test_search_and_set_language(aut: StatusAut, language, native):
+def test_search_and_set_language(aut, language, native):
     main_window: MainWindow = aut.start()
     BeforeStartedPopUp().get_started()
     main_window.welcome_screen.sign_up()
@@ -85,6 +83,3 @@ def test_search_and_set_language(aut: StatusAut, language, native):
     main_window.welcome_screen.log_in()
     language_settings = main_window.navigator.open_settings().menu_panel.open_language_settings()
     assert language_settings.language == native
-    language_settings.language = 'English'
-    ChangeLanguagePopup().close_app()
-    aut.detach().wait_for_close()

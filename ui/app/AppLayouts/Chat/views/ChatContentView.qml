@@ -24,11 +24,8 @@ import "../stores"
 
 ColumnLayout {
     id: root
-    objectName: "chatContentViewColumn"
-    spacing: 0
 
-    // Important:
-    // Each chat/channel has its own ChatContentModule
+    // Important: each chat/channel has its own ChatContentModule
     property var chatContentModule
     property var chatSectionModule
     property var rootStore
@@ -43,10 +40,6 @@ ColumnLayout {
     property var stickersPopup
     property UsersStore usersStore: UsersStore {}
 
-    onChatContentModuleChanged: if (!!chatContentModule) {
-        root.usersStore.usersModule = root.chatContentModule.usersModule
-    }
-
     signal openAppSearch()
     signal openStickerPackPopup(string stickerPackId)
 
@@ -59,19 +52,16 @@ ColumnLayout {
     property string chatInputPlaceholder: root.rootStore.chatInputPlaceHolderText
     property bool stickersLoaded: false
 
-    Loader {
-        Layout.fillWidth: true
-        active: root.isBlocked
-        visible: active
-        sourceComponent: StatusBanner {
-            type: StatusBanner.Type.Danger
-            statusText: qsTr("Blocked")
-        }
-    }
-
     readonly property var messageStore: MessageStore {
         messageModule: chatContentModule ? chatContentModule.messagesModule : null
         chatSectionModule: root.rootStore.chatCommunitySectionModule
+    }
+
+    objectName: "chatContentViewColumn"
+    spacing: 0
+
+    onChatContentModuleChanged: if (!!chatContentModule) {
+        root.usersStore.usersModule = root.chatContentModule.usersModule
     }
 
     QtObject {
@@ -82,166 +72,137 @@ ColumnLayout {
             if (!obj) {
                 return
             }
-            if (inputAreaLoader.item) {
-                inputAreaLoader.item.chatInput.showReplyArea(messageId, obj.senderDisplayName, obj.messageText, obj.contentType, obj.messageImage, obj.albumMessageImages, obj.albumImagesCount, obj.sticker)
+            chatInput.showReplyArea(messageId, obj.senderDisplayName, obj.messageText, obj.contentType, obj.messageImage, obj.albumMessageImages, obj.albumImagesCount, obj.sticker)
+        }
+    }
+
+    Loader {
+        Layout.fillWidth: true
+        active: root.isBlocked
+        visible: active
+        sourceComponent: StatusBanner {
+            type: StatusBanner.Type.Danger
+            statusText: qsTr("Blocked")
+        }
+    }
+
+    Loader {
+        id: chatMessagesLoader
+        Layout.fillWidth: true
+        Layout.fillHeight: true
+
+        sourceComponent: ChatMessagesView {
+            chatContentModule: root.chatContentModule
+            rootStore: root.rootStore
+            contactsStore: root.contactsStore
+            messageStore: root.messageStore
+            emojiPopup: root.emojiPopup
+            stickersPopup: root.stickersPopup
+            usersStore: root.usersStore
+            stickersLoaded: root.stickersLoaded
+            chatId: root.chatId
+            isOneToOne: root.chatType === Constants.chatType.oneToOne
+            isChatBlocked: root.isBlocked || !root.isUserAllowedToSendMessage
+            channelEmoji: !chatContentModule ? "" : (chatContentModule.chatDetails.emoji || "")
+            isActiveChannel: root.isActiveChannel
+            onShowReplyArea: (messageId, senderId) => {
+                d.showReplyArea(messageId)
+            }
+            onOpenStickerPackPopup: {
+                root.openStickerPackPopup(stickerPackId);
+            }
+            onEditModeChanged: {
+                if (!editModeOn)
+                    chatInput.forceInputActiveFocus()
             }
         }
     }
 
-    ColumnLayout {
+    StatusChatInput {
+        id: chatInput
+
         Layout.fillWidth: true
-        Layout.fillHeight: true
-        clip: true
+        Layout.margins: Style.current.smallPadding
 
-        Loader {
-            id: chatMessagesLoader
-            Layout.fillWidth: true
-            Layout.fillHeight: true
+        enabled: root.rootStore.sectionDetails.joined && !root.rootStore.sectionDetails.amIBanned &&
+                 root.isUserAllowedToSendMessage
 
-            sourceComponent: ChatMessagesView {
-                chatContentModule: root.chatContentModule
-                rootStore: root.rootStore
-                contactsStore: root.contactsStore
-                messageStore: root.messageStore
-                emojiPopup: root.emojiPopup
-                stickersPopup: root.stickersPopup
-                usersStore: root.usersStore
-                stickersLoaded: root.stickersLoaded
-                chatId: root.chatId
-                isOneToOne: root.chatType === Constants.chatType.oneToOne
-                isChatBlocked: root.isBlocked || !root.isUserAllowedToSendMessage
-                channelEmoji: !chatContentModule ? "" : (chatContentModule.chatDetails.emoji || "")
-                isActiveChannel: root.isActiveChannel
-                onShowReplyArea: (messageId, senderId) => {
-                    d.showReplyArea(messageId)
-                }
-                onOpenStickerPackPopup: {
-                    root.openStickerPackPopup(stickerPackId);
-                }
-                onEditModeChanged: {
-                    if (!editModeOn && inputAreaLoader.item)
-                        inputAreaLoader.item.chatInput.forceInputActiveFocus()
-                }
+        store: root.rootStore
+        usersStore: root.usersStore
+
+        textInput.placeholderText: root.chatInputPlaceholder
+        emojiPopup: root.emojiPopup
+        stickersPopup: root.stickersPopup
+        isContactBlocked: root.isBlocked
+        isActiveChannel: root.isActiveChannel
+        chatType: root.chatType
+        suggestions.suggestionFilter.addSystemSuggestions: chatType === Constants.chatType.communityChat
+
+        Binding on chatInputPlaceholder {
+            when: root.isBlocked
+            value: qsTr("This user has been blocked.")
+        }
+
+        Binding on chatInputPlaceholder {
+            when: !root.rootStore.sectionDetails.joined || root.rootStore.sectionDetails.amIBanned
+            value: qsTr("You need to join this community to send messages")
+        }
+
+        onSendTransactionCommandButtonClicked: {
+            if(!chatContentModule) {
+                console.debug("error on sending transaction command - chat content module is not set")
+                return
+            }
+
+            if (Utils.isEnsVerified(chatContentModule.getMyChatId())) {
+                Global.openPopup(root.sendTransactionWithEnsModal)
+            } else {
+                Global.openPopup(root.sendTransactionNoEnsModal)
+            }
+        }
+        onReceiveTransactionCommandButtonClicked: {
+            Global.openPopup(root.receiveTransactionModal)
+        }
+        onStickerSelected: {
+            root.rootStore.sendSticker(chatContentModule.getMyChatId(),
+                                                  hashId,
+                                                  chatInput.isReply ? chatInput.replyMessageId : "",
+                                                  packId,
+                                                  url)
+        }
+
+
+        onSendMessage: {
+            if (!chatContentModule) {
+                console.debug("error on sending message - chat content module is not set")
+                return
+            }
+
+            if(root.rootStore.sendMessage(chatContentModule.getMyChatId(),
+                                          event,
+                                          chatInput.getTextWithPublicKeys(),
+                                          chatInput.isReply? chatInput.replyMessageId : "",
+                                          chatInput.fileUrlsAndSources
+                                          ))
+            {
+                Global.playSendMessageSound()
+
+                chatInput.textInput.clear();
+                chatInput.textInput.textFormat = TextEdit.PlainText;
+                chatInput.textInput.textFormat = TextEdit.RichText;
             }
         }
 
-        Loader {
-            id: inputAreaLoader
+        onUnblockChat: {
+            chatContentModule.unblockChat()
+        }
+        onKeyUpPress: messageStore.setEditModeOnLastMessage(root.rootStore.userProfileInst.pubKey)
 
-            Layout.alignment: Qt.AlignHCenter | Qt.AlignBottom
-            Layout.fillWidth: true
-
-            active: root.isActiveChannel
-            asynchronous: true
-
-            property string preservedText
-            Binding on preservedText {
-                when: inputAreaLoader.item != null
-                value: inputAreaLoader.item ? inputAreaLoader.item.chatInput.textInput.text : inputAreaLoader.preservedText
-                restoreMode: Binding.RestoreNone
-                delayed: true
-            }
-
-            // FIXME: `StatusChatInput` is way too heavy
-            // see: https://github.com/status-im/status-desktop/pull/10343#issuecomment-1515103756
-            sourceComponent: Item {
-                id: inputArea
-                implicitHeight: chatInput.implicitHeight
-                                + chatInput.anchors.topMargin
-                                + chatInput.anchors.bottomMargin
-
-                readonly property alias chatInput: chatInput
-
-                StatusChatInput {
-                    id: chatInput
-
-                    anchors.fill: parent
-                    anchors.margins: Style.current.smallPadding
-
-                    enabled: root.rootStore.sectionDetails.joined && !root.rootStore.sectionDetails.amIBanned &&
-                             root.isUserAllowedToSendMessage
-
-                    store: root.rootStore
-                    usersStore: root.usersStore
-
-                    textInput.text: inputAreaLoader.preservedText
-                    textInput.placeholderText: root.chatInputPlaceholder
-                    emojiPopup: root.emojiPopup
-                    stickersPopup: root.stickersPopup
-                    isContactBlocked: root.isBlocked
-                    isActiveChannel: root.isActiveChannel
-                    anchors.bottom: parent.bottom
-                    chatType: root.chatType
-                    suggestions.suggestionFilter.addSystemSuggestions: chatType === Constants.chatType.communityChat
-
-                    Binding on chatInputPlaceholder {
-                        when: root.isBlocked
-                        value: qsTr("This user has been blocked.")
-                    }
-
-                    Binding on chatInputPlaceholder {
-                        when: !root.rootStore.sectionDetails.joined || root.rootStore.sectionDetails.amIBanned
-                        value: qsTr("You need to join this community to send messages")
-                    }
-
-                    onSendTransactionCommandButtonClicked: {
-                        if(!chatContentModule) {
-                            console.debug("error on sending transaction command - chat content module is not set")
-                            return
-                        }
-
-                        if (Utils.isEnsVerified(chatContentModule.getMyChatId())) {
-                            Global.openPopup(root.sendTransactionWithEnsModal)
-                        } else {
-                            Global.openPopup(root.sendTransactionNoEnsModal)
-                        }
-                    }
-                    onReceiveTransactionCommandButtonClicked: {
-                        Global.openPopup(root.receiveTransactionModal)
-                    }
-                    onStickerSelected: {
-                        root.rootStore.sendSticker(chatContentModule.getMyChatId(),
-                                                              hashId,
-                                                              chatInput.isReply ? chatInput.replyMessageId : "",
-                                                              packId,
-                                                              url)
-                    }
-
-
-                    onSendMessage: {
-                        if (!chatContentModule) {
-                            console.debug("error on sending message - chat content module is not set")
-                            return
-                        }
-
-                        if(root.rootStore.sendMessage(chatContentModule.getMyChatId(),
-                                                      event,
-                                                      chatInput.getTextWithPublicKeys(),
-                                                      chatInput.isReply? chatInput.replyMessageId : "",
-                                                      chatInput.fileUrlsAndSources
-                                                      ))
-                        {
-                            Global.playSendMessageSound()
-
-                            chatInput.textInput.clear();
-                            chatInput.textInput.textFormat = TextEdit.PlainText;
-                            chatInput.textInput.textFormat = TextEdit.RichText;
-                        }
-                    }
-
-                    onUnblockChat: {
-                        chatContentModule.unblockChat()
-                    }
-                    onKeyUpPress: messageStore.setEditModeOnLastMessage(root.rootStore.userProfileInst.pubKey)
-
-                    Component.onCompleted: {
-                        Qt.callLater(() => {
-                            forceInputActiveFocus()
-                            textInput.cursorPosition = textInput.length
-                        })
-                    }
-                }
-            }
+        Component.onCompleted: {
+            Qt.callLater(() => {
+                forceInputActiveFocus()
+                textInput.cursorPosition = textInput.length
+            })
         }
     }
 }

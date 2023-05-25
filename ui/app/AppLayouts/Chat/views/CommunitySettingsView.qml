@@ -334,6 +334,7 @@ StatusSectionLayout {
                                                      accountName,
                                                      artworkCropRect)
                 }
+
                 onSignSelfDestructTransactionOpened: communityTokensStore.computeSelfDestructFee(selfDestructTokensList, tokenKey)
                 onRemoteSelfDestructCollectibles: {
                     communityTokensStore.remoteSelfDestructCollectibles(root.community.id,

@@ -11,6 +11,7 @@ _logger = logging.getLogger(__name__)
 pytest_plugins = [
     'tests.fixtures.aut',
     'tests.fixtures.path',
+    'tests.fixtures.squish',
 ]
 
 

@@ -2,7 +2,7 @@ import driver
 
 from gui.components.back_up_your_seed_phrase_popup import BackUpYourSeedPhrasePopUp
 from gui.components.send_contact_request_popup import SendContactRequestPopup
-from gui.elements import BaseElement, Button, List, TextEdit
+from gui.elements.base_element import BaseElement
 
 
 class MenuPanel(BaseElement):

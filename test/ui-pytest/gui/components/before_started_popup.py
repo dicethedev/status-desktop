@@ -1,4 +1,6 @@
-from gui.elements import BaseElement, CheckBox, Button
+from gui.elements.base_element import BaseElement
+from gui.elements.button import Button
+from gui.elements.check_box import CheckBox
 
 
 class BeforeStartedPopUp(BaseElement):

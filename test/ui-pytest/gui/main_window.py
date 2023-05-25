@@ -1,7 +1,8 @@
 import logging
 
-from gui.elements import BaseElement, Button
+from gui.elements.base_element import BaseElement
 from gui.elements.base_window import BaseWindow
+from gui.elements.button import Button
 from gui.screens.onboarding import WelcomeScreen
 from gui.screens.settings import SettingsScreen
 

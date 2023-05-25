@@ -1,7 +1,7 @@
 import logging
 
 import driver
-from gui.elements import BaseElement
+from gui.elements.base_element import BaseElement
 
 _logger = logging.getLogger(__name__)
 

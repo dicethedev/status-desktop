@@ -66,6 +66,20 @@ def wait_for_close(process_name: str, timeout_sec: int = 10):
     _logger.info(f'Process closed: {process_name}')
 
 
+def find_process_by_port(port: int):
+    for proc in psutil.process_iter():
+        try:
+            for conns in proc.connections(kind='inet'):
+                if conns.laddr.port == port:
+                    return run_info(
+                        proc.pid,
+                        proc.name(),
+                        datetime.fromtimestamp(proc.create_time()).strftime("%H:%M:%S.%f")
+                    )
+        except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
+            pass
+
+
 def execute(
         command: list,
         shell=True,

@@ -29,6 +29,10 @@ class BaseElement:
         return driver.waitForObjectExists(self.real_name)
 
     @property
+    def exists(self) -> bool:
+        return driver.object.exists(self.real_name)
+
+    @property
     def bounds(self):
         return driver.object.globalBounds(self.object)
 

@@ -8,13 +8,14 @@ ROOT: SystemPath = SystemPath(__file__).resolve().parent.parent
 
 # Application Directories
 AUT: SystemPath = SystemPath(os.getenv('AUT_PATH', ROOT.parent.parent / 'bin' / 'nim_status_client'))
-STATUS_DATA: SystemPath = ROOT.parent.parent / 'Status'
+
 
 # Test Directories
-RUN_ID = os.getenv('RUN_DIR', f'run_{datetime.now(): %d%m%Y_%H%M%S}')
+RUN_ID = os.getenv('RUN_DIR', f'run_{datetime.now():%d%m%Y_%H%M%S}')
 TEMP: SystemPath = ROOT / 'tmp'
 RESULTS: SystemPath = TEMP / 'results'
 RUN: SystemPath = RESULTS / RUN_ID
+STATUS_DATA: SystemPath = RUN / 'status'
 VP: SystemPath = ROOT / 'exe' / 'vp'
 UI_IMG: SystemPath = VP / 'ui_img'
 # Runtime initialisation

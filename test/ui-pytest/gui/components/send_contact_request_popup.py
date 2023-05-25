@@ -1,4 +1,6 @@
-from gui.elements import BaseElement, TextEdit, Button
+from gui.elements.base_element import BaseElement
+from gui.elements.button import Button
+from gui.elements.text_edit import TextEdit
 
 
 class SendContactRequestPopup(BaseElement):

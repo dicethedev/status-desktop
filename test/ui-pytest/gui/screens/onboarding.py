@@ -2,9 +2,23 @@ import time
 from abc import abstractmethod
 
 import constants
+import driver
 from constants import UserAccount
 from gui.components.splash_screen import SplashScreen
-from gui.elements import BaseElement, Button, TextEdit
+from gui.elements.base_element import BaseElement
+from gui.elements.button import Button
+from gui.elements.text_edit import TextEdit
+
+
+class AllowNotificationsView(BaseElement):
+
+    def __init__(self):
+        super(AllowNotificationsView, self).__init__('mainWindow_AllowNotificationsView')
+        self._allow_button = Button('mainWindow_allowNotificationsOnboardingOkButton')
+
+    def allow(self):
+        self._allow_button.click()
+        self.wait_until_hidden()
 
 
 class WelcomeScreen(BaseElement):
@@ -21,9 +35,9 @@ class WelcomeScreen(BaseElement):
             .next() \
             .next() \
             .create_password(user_account.password) \
-            .confirm_password(user_account.password)
-        # SplashScreen().wait_until_appears().wait_until_hidden(configs.squish.APP_LOAD_TIMEOUT_MSEC)
-        pass
+            .confirm_password(user_account.password) \
+            .prefer_password()
+        SplashScreen().wait_until_appears().wait_until_hidden(driver.config.APP_LOAD_TIMEOUT_MSEC)
 
     def get_keys(self) -> 'KeysScreen':
         self._new_user_button.click()
@@ -125,13 +139,25 @@ class ConfirmPasswordView(OnboardingBaseScreen):
         self._confirm_password_text_field = TextEdit('mainWindow_confirmAgainPasswordInput')
         self._confirm_button = Button('mainWindow_Finalise_Status_Password_Creation_StatusButton')
 
-    def confirm_password(self, value: str):
+    def confirm_password(self, value: str) -> 'TouchIDAuthView':
         self._confirm_password_text_field.text = value
         self._confirm_button.click()
+        return TouchIDAuthView().wait_until_appears()
 
     def back(self):
         self._back_button.click()
         return CreatePasswordView().wait_until_appears()
+
+
+class TouchIDAuthView(OnboardingBaseScreen):
+
+    def __init__(self):
+        super(TouchIDAuthView, self).__init__('mainWindow_TouchIDAuthView')
+        self._prefer_password_button = Button('mainWindow_touchIdIPreferToUseMyPasswordText')
+
+    def prefer_password(self):
+        self._prefer_password_button.click()
+        self.wait_until_hidden()
 
 
 class LoginView(BaseElement):

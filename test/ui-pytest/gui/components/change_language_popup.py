@@ -1,4 +1,5 @@
-from gui.elements import BaseElement, Button
+from gui.elements.base_element import BaseElement
+from gui.elements.button import Button
 
 
 class ChangeLanguagePopup(BaseElement):

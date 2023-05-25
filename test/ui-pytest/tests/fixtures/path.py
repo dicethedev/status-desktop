@@ -45,7 +45,7 @@ def generate_test_info(node):
 def run_dir():
     _logger.info('Setup session: Directories')
     keep_results = 5
-    run_name_pattern = 'run_ ????????_??????'
+    run_name_pattern = 'run_????????_??????'
     runs = list(sorted(configs.path.RESULTS.glob(run_name_pattern)))
     if len(runs) > keep_results:
         del_runs = runs[:len(runs) - keep_results]

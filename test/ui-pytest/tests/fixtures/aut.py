@@ -8,6 +8,7 @@ import configs
 import constants
 import driver
 from constants import UserAccount
+from driver import context
 from gui.components.before_started_popup import BeforeStartedPopUp
 from gui.components.splash_screen import SplashScreen
 from gui.main_window import MainWindow
@@ -17,12 +18,13 @@ _logger = logging.getLogger(__name__)
 
 
 @pytest.fixture
-def aut() -> driver.aut.ExecutableAut:
-    _aut = driver.aut.ExecutableAut(configs.path.AUT)
+def aut() -> driver.aut.ApplicationLauncher:
     if not configs.path.AUT.exists():
         pytest.exit(f"Application not found: {configs.path.AUT}")
+    _aut = driver.aut.ApplicationLauncher(configs.path.AUT)
     yield _aut
     _aut.detach()
+    _aut.stop()
 
 
 @pytest.fixture
@@ -31,12 +33,12 @@ def app_data() -> driver.system_path.SystemPath:
 
 
 @pytest.fixture
-def main_window(request, aut: driver.aut.ExecutableAut, app_data) -> MainWindow:
+def main_window(request, aut: driver.aut.ApplicationLauncher, app_data) -> MainWindow:
     if hasattr(request, 'param'):
         user_data = request.param
         user_data.copy_to(app_data / 'data')
 
-    aut.start(f'--datadir={app_data}')
+    aut.launch(f'-d={app_data}')
     yield MainWindow().wait_until_appears().prepare()
 
 
@@ -51,7 +53,7 @@ def main_screen(request, main_window: MainWindow) -> MainWindow:
     AllowNotificationsView().wait_until_appears().allow()
     BeforeStartedPopUp().get_started()
     main_window.welcome_screen.sign_up(user_account)
-    SplashScreen().wait_until_appears().wait_until_hidden(driver.config.APP_LOAD_TIMEOUT_MSEC)
+    SplashScreen().wait_until_appears().wait_until_hidden(driver.settings.APP_LOAD_TIMEOUT_MSEC)
     yield main_window
 
 

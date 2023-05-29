@@ -1,3 +1,4 @@
+import time
 import typing
 
 from gui.elements.base_element import BaseElement
@@ -62,6 +63,7 @@ class BackUpYourSeedPhrasePopUp(BaseElement):
         self._confirm_seed_phrase_button.click()
 
     def reveal_seed_phrase(self):
+        time.sleep(1)
         self._reveal_seed_phrase_button.click()
 
     def get_seed_phrases(self):

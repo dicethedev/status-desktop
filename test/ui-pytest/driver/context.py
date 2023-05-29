@@ -3,12 +3,12 @@ import time
 
 import squish
 
-from driver import config
+from driver import settings
 
 _logger = logging.getLogger(__name__)
 
 
-def attach(aut_name: str, timeout_sec: int = config.PROCESS_TIMEOUT_SEC):
+def attach(aut_name: str, timeout_sec: int = settings.PROCESS_TIMEOUT_SEC):
     _logger.info(f'Attaching squish to {aut_name}')
     started_at = time.monotonic()
     while True:
@@ -23,5 +23,7 @@ def attach(aut_name: str, timeout_sec: int = config.PROCESS_TIMEOUT_SEC):
 
 
 def detach():
-    [ctx.detach() for ctx in squish.applicationContextList()]
+    for ctx in squish.applicationContextList():
+        ctx.detach()
+        assert squish.waitFor(lambda: not ctx.isRunning, settings.APP_LOAD_TIMEOUT_MSEC)
     _logger.info(f'All AUTs detached')

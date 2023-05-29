@@ -1,7 +1,7 @@
 import squish
 import toplevelwindow
 
-from . import config
+from . import settings
 
 
 def maximize(object_name):
@@ -12,7 +12,7 @@ def maximize(object_name):
         except RuntimeError:
             return False
 
-    return squish.waitFor(lambda: _maximize(), config.UI_LOAD_TIMEOUT_MSEC)
+    return squish.waitFor(lambda: _maximize(), settings.UI_LOAD_TIMEOUT_MSEC)
 
 
 def minimize(object_name):
@@ -23,7 +23,7 @@ def minimize(object_name):
         except RuntimeError:
             return False
 
-    return squish.waitFor(lambda: _minimize(), config.UI_LOAD_TIMEOUT_MSEC)
+    return squish.waitFor(lambda: _minimize(), settings.UI_LOAD_TIMEOUT_MSEC)
 
 
 def set_focus(object_name):
@@ -34,7 +34,7 @@ def set_focus(object_name):
         except RuntimeError:
             return False
 
-    return squish.waitFor(lambda: _set_focus(), config.UI_LOAD_TIMEOUT_MSEC)
+    return squish.waitFor(lambda: _set_focus(), settings.UI_LOAD_TIMEOUT_MSEC)
 
 
 def on_top_level(object_name):
@@ -45,7 +45,7 @@ def on_top_level(object_name):
         except RuntimeError:
             return False
 
-    return squish.waitFor(lambda: _on_top(), config.UI_LOAD_TIMEOUT_MSEC)
+    return squish.waitFor(lambda: _on_top(), settings.UI_LOAD_TIMEOUT_MSEC)
 
 
 def close(object_name):

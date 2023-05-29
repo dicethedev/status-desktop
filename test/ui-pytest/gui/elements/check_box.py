@@ -8,4 +8,4 @@ class CheckBox(BaseElement):
         if self.is_checked is not value:
             self.click(x, y)
             assert driver.waitFor(
-                lambda: self.is_checked is value, driver.config.UI_LOAD_TIMEOUT_MSEC), 'Value not changed'
+                lambda: self.is_checked is value, driver.settings.UI_LOAD_TIMEOUT_MSEC), 'Value not changed'

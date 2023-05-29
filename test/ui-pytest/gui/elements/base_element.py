@@ -22,7 +22,7 @@ class BaseElement:
 
     @property
     def object(self):
-        return driver.waitForObject(self.real_name, driver.config.UI_LOAD_TIMEOUT_MSEC)
+        return driver.waitForObject(self.real_name, driver.settings.UI_LOAD_TIMEOUT_MSEC)
 
     @property
     def existent(self):
@@ -80,7 +80,7 @@ class BaseElement:
             button or driver.Qt.LeftButton
         )
 
-    def hover(self, timeout_msec: int = driver.config.UI_LOAD_TIMEOUT_MSEC):
+    def hover(self, timeout_msec: int = driver.settings.UI_LOAD_TIMEOUT_MSEC):
         def _hover():
             try:
                 driver.mouseMove(self.object)
@@ -92,12 +92,12 @@ class BaseElement:
 
         assert driver.waitFor(lambda: _hover(), timeout_msec)
 
-    def wait_until_appears(self, timeout_msec: int = driver.config.UI_LOAD_TIMEOUT_MSEC):
+    def wait_until_appears(self, timeout_msec: int = driver.settings.UI_LOAD_TIMEOUT_MSEC):
         assert driver.waitFor(lambda: self.is_visible, timeout_msec), f'Object {self} is not visible'
         return self
 
-    def wait_until_hidden(self, timeout_msec: int = driver.config.UI_LOAD_TIMEOUT_MSEC):
+    def wait_until_hidden(self, timeout_msec: int = driver.settings.UI_LOAD_TIMEOUT_MSEC):
         assert driver.waitFor(lambda: not self.is_visible, timeout_msec), f'Object {self} is not hidden'
 
-    def wait_for(self, condition, timeout_msec: int = driver.config.UI_LOAD_TIMEOUT_MSEC) -> bool:
+    def wait_for(self, condition, timeout_msec: int = driver.settings.UI_LOAD_TIMEOUT_MSEC) -> bool:
         return driver.waitFor(lambda: condition, timeout_msec)

@@ -37,7 +37,7 @@ class WelcomeScreen(BaseElement):
             .create_password(user_account.password) \
             .confirm_password(user_account.password) \
             .prefer_password()
-        SplashScreen().wait_until_appears().wait_until_hidden(driver.config.APP_LOAD_TIMEOUT_MSEC)
+        SplashScreen().wait_until_appears().wait_until_hidden(driver.settings.APP_LOAD_TIMEOUT_MSEC)
 
     def get_keys(self) -> 'KeysScreen':
         self._new_user_button.click()

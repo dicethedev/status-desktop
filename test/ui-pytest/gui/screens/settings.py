@@ -3,6 +3,9 @@ import driver
 from gui.components.back_up_your_seed_phrase_popup import BackUpYourSeedPhrasePopUp
 from gui.components.send_contact_request_popup import SendContactRequestPopup
 from gui.elements.base_element import BaseElement
+from gui.elements.button import Button
+from gui.elements.list import List
+from gui.elements.text_edit import TextEdit
 
 
 class MenuPanel(BaseElement):

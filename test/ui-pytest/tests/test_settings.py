@@ -28,7 +28,7 @@ def test_backup_seed_phrase(main_screen: MainWindow):
     back_up_seed_phrase_popup.i_acknowledge = True
     back_up_seed_phrase_popup.complete()
     assert driver.waitFor(
-        lambda: not main_screen.is_secure_phrase_banner_visible(), driver.config.UI_LOAD_TIMEOUT_MSEC)
+        lambda: not main_screen.is_secure_phrase_banner_visible(), driver.settings.UI_LOAD_TIMEOUT_MSEC)
 
 
 # Test Case: https://ethstatus.testrail.net/index.php?/cases/view/703011
@@ -48,7 +48,7 @@ def test_add_contact_with_chat_key(main_screen: MainWindow, chat_key, who_you_ar
 # Each language run takes 30 seconds, so only some of them are enabled until we can parallelize executions
 @pytest.mark.parametrize('language, native', [
     # ('English', 'English'),
-    ('Arabic', 'العربية'),
+    pytest.param('Arabic', 'العربية', id='Arabic'),
     # ('Bengali', 'বাংলা'),
     # ('Chinese (China)', '中文（中國)'),
     # ('Chinese (Taiwan)', '中文（台灣)'),
@@ -72,7 +72,7 @@ def test_add_contact_with_chat_key(main_screen: MainWindow, chat_key, who_you_ar
     # ('Turkish', 'Türkçe')
 ])
 def test_search_and_set_language(aut, app_data, language, native):
-    aut.start(f'--datadir={app_data}')
+    aut.launch(f'-d={app_data}')
     main_window = MainWindow().wait_until_appears().prepare()
     AllowNotificationsView().allow()
     BeforeStartedPopUp().get_started()
@@ -80,9 +80,9 @@ def test_search_and_set_language(aut, app_data, language, native):
     language_settings = main_window.navigator.open_settings().menu_panel.open_language_settings()
     language_settings.language = language
     ChangeLanguagePopup().close_app()
-    aut.detach().wait_for_close()
+    aut.detach()
 
-    aut.start(f'--datadir={app_data}')
+    aut.launch(f'-d={app_data}')
     main_window = MainWindow().wait_until_appears().prepare()
     main_window.welcome_screen.log_in()
     language_settings = main_window.navigator.open_settings().menu_panel.open_language_settings()

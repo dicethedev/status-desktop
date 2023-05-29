@@ -43,7 +43,7 @@ def pytest_exception_interact(node):
 
         # Close test application
         driver.context.detach()
-        driver.utils.local_system.kill_process_by_name(configs.path.AUT.name)
+        driver.local_system.kill_process_by_name(configs.path.AUT.name)
 
         # TODO: Save application logs
     except Exception as ex:

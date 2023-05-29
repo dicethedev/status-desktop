@@ -1,12 +1,12 @@
 import typing
 
-from driver import config, local_system, remote_system
+from driver import settings, local_system, remote_system
 
 _PROCESS_NAME = '_squishserver'
 
 
 def start():
-    local_system.execute([config.SERVER, '--configfile', config.SERVER_CONFIG, '--verbose', '&'])
+    local_system.execute([settings.SERVER, '--configfile', settings.SERVER_CONFIG, '--verbose', '&'])
     local_system.wait_for_started(_PROCESS_NAME, 3)
 
 
@@ -15,15 +15,15 @@ def stop():
 
 
 def prepare_config():
-    if config.SERVER_CONFIG.exists():
-        config.SERVER_CONFIG.unlink()
-    set_cursor_animation(config.CURSOR_ANIMATION)
-    set_aut_timeout(config.APP_LOAD_TIMEOUT_MSEC)
+    if settings.SERVER_CONFIG.exists():
+        settings.SERVER_CONFIG.unlink()
+    set_cursor_animation(settings.CURSOR_ANIMATION)
+    set_aut_timeout(settings.APP_LOAD_TIMEOUT_MSEC)
 
 
 # https://doc-snapshots.qt.io/squish/cli-squishserver.html
 def configuring(action: str, options: typing.Union[int, str, list]):
-    command = [config.SERVER, '--configfile', str(config.SERVER_CONFIG), '--config', action, options]
+    command = [settings.SERVER, '--configfile', str(settings.SERVER_CONFIG), '--config', action, options]
     remote_system.execute(command)
 
 

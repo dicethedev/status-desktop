@@ -4,10 +4,12 @@ from abc import abstractmethod
 import constants
 import driver
 from constants import UserAccount
+from driver import settings
 from gui.components.splash_screen import SplashScreen
 from gui.elements.base_element import BaseElement
 from gui.elements.button import Button
 from gui.elements.text_edit import TextEdit
+from gui.elements.text_label import TextLabel
 
 
 class AllowNotificationsView(BaseElement):
@@ -28,16 +30,16 @@ class WelcomeScreen(BaseElement):
         self._new_user_button = Button('mainWindow_I_am_new_to_Status_StatusBaseText')
         self._existing_user_button = Button('mainWindow_I_already_use_Status_StatusBaseText')
 
-    def sign_up(self, user_account: UserAccount = constants.user_account_1):
+    def sign_up(self, user_account: UserAccount = constants.user_account):
         self.get_keys() \
             .generate_new_keys() \
             .set_display_name(user_account.name) \
             .next() \
             .next() \
             .create_password(user_account.password) \
-            .confirm_password(user_account.password) \
-            .prefer_password()
-        SplashScreen().wait_until_appears().wait_until_hidden(driver.settings.APP_LOAD_TIMEOUT_MSEC)
+            .confirm_password(user_account.password)
+        if driver.local_system.is_mac():
+            TouchIDAuthView().wait_until_appears().prefer_password()
 
     def get_keys(self) -> 'KeysScreen':
         self._new_user_button.click()
@@ -48,9 +50,8 @@ class WelcomeScreen(BaseElement):
         self._existing_user_button.click()
         # TODO: return next view
 
-    def log_in(self, account: UserAccount = constants.user_account_1):
+    def log_in(self, account: UserAccount = constants.user_account):
         LoginView().log_in(account)
-        SplashScreen().wait_until_appears().wait_until_hidden()
 
 
 class OnboardingBaseScreen(BaseElement):
@@ -139,10 +140,9 @@ class ConfirmPasswordView(OnboardingBaseScreen):
         self._confirm_password_text_field = TextEdit('mainWindow_confirmAgainPasswordInput')
         self._confirm_button = Button('mainWindow_Finalise_Status_Password_Creation_StatusButton')
 
-    def confirm_password(self, value: str) -> 'TouchIDAuthView':
+    def confirm_password(self, value: str):
         self._confirm_password_text_field.text = value
         self._confirm_button.click()
-        return TouchIDAuthView().wait_until_appears()
 
     def back(self):
         self._back_button.click()
@@ -166,8 +166,34 @@ class LoginView(BaseElement):
         super(LoginView, self).__init__('mainWindow_LoginView')
         self._password_text_edit = TextEdit('loginView_passwordInput')
         self._arrow_right_button = Button('loginView_submitBtn')
+        self._current_user_name_label = TextLabel('loginView_currentUserNameLabel')
+        self._change_account_button = Button('loginView_changeAccountBtn')
+        self._accounts_combobox = BaseElement('accountsView_accountListPanel')
 
     def log_in(self, account):
+        if self._current_user_name_label.text != account.name:
+            self._change_account_button.hover()
+            self._change_account_button.click()
+            self.select_user_name(account.name)
+
         self._password_text_edit.text = account.password
         self._arrow_right_button.click()
         self.wait_until_hidden()
+
+    def select_user_name(self, user_name, timeout_msec: int = settings.UI_LOAD_TIMEOUT_MSEC):
+        names = set()
+
+        def _select_user() -> bool:
+            for index in range(self._accounts_combobox.object.count):
+                name_object = self._accounts_combobox.object.itemAt(index)
+                name_label = str(name_object.label)
+                names.add(name_label)
+                if name_label == user_name:
+                    try:
+                        driver.mouseClick(name_object)
+                    except RuntimeError:
+                        continue
+                    return True
+            return False
+
+        assert driver.waitFor(lambda: _select_user(), timeout_msec), f'User name: "{user_name}" not found in {names}'

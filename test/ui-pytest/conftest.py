@@ -24,13 +24,6 @@ def setup_session_scope(
     _logger.info('Setup session: Done')
 
 
-@pytest.fixture(autouse=True)
-def setup_function_scope(
-        clear_user_data
-):
-    _logger.info('Setup function: Done')
-
-
 def pytest_exception_interact(node):
     """Handles test on fail."""
     try:

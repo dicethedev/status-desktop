@@ -4,6 +4,7 @@ import subprocess
 import squish
 
 from driver import settings, server, context, system_path, local_system
+from gui.elements.base_window import BaseWindow
 
 
 class ApplicationLauncher:
@@ -19,9 +20,9 @@ class ApplicationLauncher:
     def __str__(self):
         return type(self).__qualname__
 
-    def attach(self, aut_id: str = None, timeout_sec: int = settings.PROCESS_TIMEOUT_SEC):
+    def attach(self, timeout_sec: int = settings.PROCESS_TIMEOUT_SEC):
         if self.ctx is None:
-            self.ctx = context.attach(aut_id, timeout_sec)
+            self.ctx = context.attach(self.app_path.stem, timeout_sec)
         squish.setApplicationContext(self.ctx)
         return self
 
@@ -32,8 +33,8 @@ class ApplicationLauncher:
         self.ctx = None
         return self
 
-    def stop(self):
-        local_system.kill_process_by_name(self.app_path.name)
+    def stop(self, verify: bool = True):
+        local_system.kill_process_by_name(self.app_path.name, verify=verify)
 
     @staticmethod
     def get_aut_port():
@@ -53,10 +54,10 @@ class ApplicationLauncher:
                    ] + list(args)
 
             local_system.execute(command)
-            self.attach(self.app_path.stem)
         else:
-            command = [self.app_path.name] + list(args)
-            self.ctx = squish.startApplication(' '.join(command))
+            command = [self.app_path.stem] + list(args)
+            self.ctx = squish.startApplication(' '.join(command), driver.settings.SERVER_HOST, driver.settings.SERVER_PORT, settings.APP_LOAD_TIMEOUT_MSEC)
+        self.attach()
 
         assert squish.waitFor(lambda: self.ctx.isRunning, settings.APP_LOAD_TIMEOUT_MSEC)
         return self

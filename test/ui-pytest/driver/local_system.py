@@ -1,5 +1,6 @@
 import logging
 import os
+import platform
 import signal
 import subprocess
 import time
@@ -19,7 +20,7 @@ def find_process_by_name(process_name: str):
     processes = []
     for proc in psutil.process_iter():
         try:
-            if process_name.lower() in proc.name().lower():
+            if process_name.lower().split('.')[0] == proc.name().lower():
                 processes.append(process_info(
                     proc.pid,
                     proc.name(),
@@ -35,13 +36,56 @@ def find_process_by_name(process_name: str):
     return processes
 
 
+def find_process_by_port(port: int):
+    for proc in psutil.process_iter():
+        try:
+            for conns in proc.connections(kind='inet'):
+                if conns.laddr.port == port:
+                    return process_info(
+                        proc.pid,
+                        proc.name(),
+                        datetime.fromtimestamp(proc.create_time()).strftime("%H:%M:%S.%f")
+                    )
+        except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
+            pass
+
+
+def find_process_by_pid(pid: int):
+    for proc in psutil.process_iter():
+        try:
+            if pid == proc.pid:
+                return process_info(
+                    proc.pid,
+                    proc.name(),
+                    datetime.fromtimestamp(proc.create_time()).strftime("%H:%M:%S.%f")
+                )
+        except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
+            pass
+
+
 def kill_process_by_name(process_name: str, verify: bool = True, timeout_sec: int = 10):
     _logger.info(f'Closing process: {process_name}')
     processes = find_process_by_name(process_name)
     for process in processes:
-        os.kill(process.pid, signal.SIGKILL)
+        try:
+            os.kill(process.pid, signal.SIGKILL)
+        except PermissionError as err:
+            _logger.info(f'Close "{process}" error: {err}')
     if verify and processes:
         wait_for_close(process_name, timeout_sec)
+
+
+def kill_process_by_pid(pid: int, verify: bool = True, timeout_sec: int = 10):
+    started_at = time.monotonic()
+    if find_process_by_pid(pid) is not None:
+        os.kill(pid, signal.SIGKILL)
+    if verify:
+        while True:
+            if find_process_by_pid(pid) is None:
+                break
+            time.sleep(1)
+            assert time.monotonic() - started_at < timeout_sec, f'Close process error: {pid}'
+        _logger.info(f'Process closed: {pid}')
 
 
 def wait_for_started(process_name: str, timeout_sec: int = settings.PROCESS_TIMEOUT_SEC):
@@ -66,20 +110,6 @@ def wait_for_close(process_name: str, timeout_sec: int = 10):
     _logger.info(f'Process closed: {process_name}')
 
 
-def find_process_by_port(port: int):
-    for proc in psutil.process_iter():
-        try:
-            for conns in proc.connections(kind='inet'):
-                if conns.laddr.port == port:
-                    return process_info(
-                        proc.pid,
-                        proc.name(),
-                        datetime.fromtimestamp(proc.create_time()).strftime("%H:%M:%S.%f")
-                    )
-        except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
-            pass
-
-
 def execute(
         command: list,
         shell=True,
@@ -97,3 +127,7 @@ def execute(
             raise subprocess.CalledProcessError(run.returncode, command, stdout, stderr)
         return subprocess.CompletedProcess(command, run.returncode, stdout, stderr)
     return run.pid
+
+
+def is_mac():
+    return platform.system() == 'Darwin'

@@ -18,7 +18,7 @@ def prepare_config():
     if settings.SERVER_CONFIG.exists():
         settings.SERVER_CONFIG.unlink()
     set_cursor_animation(settings.CURSOR_ANIMATION)
-    set_aut_timeout(settings.APP_LOAD_TIMEOUT_MSEC)
+    set_aut_timeout(settings.PROCESS_TIMEOUT_SEC)
 
 
 # https://doc-snapshots.qt.io/squish/cli-squishserver.html

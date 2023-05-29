@@ -1,9 +1,15 @@
 import logging
 
+import driver
+from constants import UserAccount
+from driver import settings
+from gui.components.before_started_popup import BeforeStartedPopUp
+from gui.components.splash_screen import SplashScreen
 from gui.elements.base_element import BaseElement
 from gui.elements.base_window import BaseWindow
 from gui.elements.button import Button
-from gui.screens.onboarding import WelcomeScreen
+from gui.screens.messages import MessagesScreen
+from gui.screens.onboarding import WelcomeScreen, AllowNotificationsView
 from gui.screens.settings import SettingsScreen
 
 _logger = logging.getLogger(__name__)
@@ -18,8 +24,9 @@ class NavigationPanel(BaseElement):
         self._wallet_button = Button('wallet_navbar_StatusNavBarTabButton')
         self._settings_button = Button('settings_navbar_StatusNavBarTabButton')
 
-    def open_message(self):
+    def open_messages_screen(self):
         self._messages_button.click()
+        return MessagesScreen().wait_until_appears()
 
     def open_communities_portal(self):
         self._communities_portal_button.click()
@@ -29,8 +36,7 @@ class NavigationPanel(BaseElement):
 
     def open_settings(self) -> SettingsScreen:
         self._settings_button.click()
-        settings = SettingsScreen().wait_until_appears()
-        return settings
+        return SettingsScreen().wait_until_appears()
 
 
 class MainWindow(BaseWindow):
@@ -43,3 +49,14 @@ class MainWindow(BaseWindow):
 
     def is_secure_phrase_banner_visible(self):
         return self._secure_your_seed_phrase_banner.is_visible
+
+    def sign_up_user(self, user_account: UserAccount):
+        if driver.local_system.is_mac():
+            AllowNotificationsView().wait_until_appears().allow()
+        BeforeStartedPopUp().get_started()
+        self.welcome_screen.sign_up(user_account)
+        return self
+
+    def log_in_user(self, user_account: UserAccount):
+        self.welcome_screen.log_in(user_account)
+        return self

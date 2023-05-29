@@ -1,4 +1,6 @@
 from collections import namedtuple
 
 UserAccount = namedtuple('User', ['name', 'password'])
-user_account_1 = UserAccount('tester123', 'TesTEr16843/!@00')
+user_account = UserAccount('tester123', 'TesTEr16843/!@00')
+user_account_two = UserAccount('Athletic', 'TesTEr16843/!@00')
+user_account_three = UserAccount('Nervous', 'TesTEr16843/!@00')

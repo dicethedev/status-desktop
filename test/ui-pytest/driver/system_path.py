@@ -1,6 +1,7 @@
 import logging
 import os
 import pathlib
+import shutil
 
 _logger = logging.getLogger(__name__)
 
@@ -30,7 +31,5 @@ class SystemPath(pathlib.Path):
                 raise
 
     def copy_to(self, destination: 'SystemPath'):
-        _logger.info("Copy from %s to %s", self, destination)
-        if not destination.exists():
-            destination.mkdir(parents=True)
-        destination.write_bytes(self.read_bytes())
+        _logger.info(f'Copy from {self} to {destination}')
+        shutil.copytree(self, destination, dirs_exist_ok=True)

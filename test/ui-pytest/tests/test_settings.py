@@ -3,6 +3,7 @@ import pytest
 import driver
 from gui.components.before_started_popup import BeforeStartedPopUp
 from gui.components.change_language_popup import ChangeLanguagePopup
+from gui.components.splash_screen import SplashScreen
 from gui.main_window import MainWindow
 from gui.screens.onboarding import AllowNotificationsView
 from gui.screens.settings import SettingsScreen
@@ -10,7 +11,7 @@ from gui.screens.settings import SettingsScreen
 
 # Test Case: https://ethstatus.testrail.net/index.php?/cases/view/702389
 @pytest.mark.case(702389)
-def test_backup_seed_phrase(main_screen: MainWindow):
+def test_backup_seed_phrase(main_screen):
     assert main_screen.is_secure_phrase_banner_visible()
     settings: SettingsScreen = main_screen.navigator.open_settings()
     back_up_seed_phrase_popup = settings.menu_panel.start_back_up_seed_phrase()
@@ -36,7 +37,7 @@ def test_backup_seed_phrase(main_screen: MainWindow):
 @pytest.mark.parametrize('chat_key, who_you_are', [
     pytest.param('zQ3shQihZMmciZWUrjvsY6kUoaqSKp9DFSjMPRkkKGty3XCKZ', 'I am a fellow tester', id='new_contact')
 ])
-def test_add_contact_with_chat_key(main_screen: MainWindow, chat_key, who_you_are):
+def test_add_contact_with_chat_key(main_screen, chat_key, who_you_are):
     settings = main_screen.navigator.open_settings()
     contact_settings = settings.menu_panel.open_messaging_settings().open_contacts_settings()
     contact_settings.add_contact_by_chat_key(chat_key, who_you_are)
@@ -74,16 +75,20 @@ def test_add_contact_with_chat_key(main_screen: MainWindow, chat_key, who_you_ar
 def test_search_and_set_language(aut, app_data, language, native):
     aut.launch(f'-d={app_data}')
     main_window = MainWindow().wait_until_appears().prepare()
-    AllowNotificationsView().allow()
+    if driver.local_system.is_mac():
+        AllowNotificationsView().allow()
     BeforeStartedPopUp().get_started()
     main_window.welcome_screen.sign_up()
+    SplashScreen().wait_until_appears().wait_until_hidden(driver.settings.APP_LOAD_TIMEOUT_MSEC)
     language_settings = main_window.navigator.open_settings().menu_panel.open_language_settings()
     language_settings.language = language
     ChangeLanguagePopup().close_app()
-    aut.detach()
+    aut.detach().stop()
 
     aut.launch(f'-d={app_data}')
     main_window = MainWindow().wait_until_appears().prepare()
     main_window.welcome_screen.log_in()
+    SplashScreen().wait_until_appears().wait_until_hidden(driver.settings.APP_LOAD_TIMEOUT_MSEC)
     language_settings = main_window.navigator.open_settings().menu_panel.open_language_settings()
     assert language_settings.language == native
+

@@ -4,10 +4,12 @@ from datetime import datetime
 
 from driver.system_path import SystemPath
 
-ROOT: SystemPath = SystemPath(__file__).resolve().parent.parent
+# Runtime initialisation
+TEST: typing.Optional[SystemPath] = None
+TEST_VP: typing.Optional[SystemPath] = None
+TEST_ARTIFACTS: typing.Optional[SystemPath] = None
 
-# Application Directories
-AUT: SystemPath = SystemPath(os.getenv('AUT_PATH', ROOT.parent.parent / 'bin' / 'nim_status_client'))
+ROOT: SystemPath = SystemPath(__file__).resolve().parent.parent
 
 
 # Test Directories
@@ -18,7 +20,8 @@ RUN: SystemPath = RESULTS / RUN_ID
 STATUS_DATA: SystemPath = RUN / 'status'
 VP: SystemPath = ROOT / 'exe' / 'vp'
 UI_IMG: SystemPath = VP / 'ui_img'
-# Runtime initialisation
-TEST: typing.Optional[SystemPath] = None
-TEST_VP: typing.Optional[SystemPath] = None
-TEST_ARTIFACTS: typing.Optional[SystemPath] = None
+
+# Application Directories
+AUT: SystemPath = SystemPath(os.getenv('AUT_PATH', ROOT.parent.parent / 'bin' / 'nim_status_client'))
+STATUS_USER_COMMUNITY_MEMBERS_DATA: SystemPath = ROOT.parent / 'ui-test' / 'fixtures' / 'community_members'
+STATUS_USER_MUTUAL_CONTACTS_DATA: SystemPath = ROOT.parent / 'ui-test' / 'fixtures' / 'mutual_contacts'

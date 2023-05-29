@@ -10,15 +10,6 @@ _logger = logging.getLogger(__name__)
 
 
 @pytest.fixture
-def clear_user_data():
-    _logger.info('Setup function: Clear user data')
-    if configs.path.STATUS_DATA.exists():
-        configs.path.STATUS_DATA.rmtree()
-    else:
-        _logger.info('User data is empty')
-
-
-@pytest.fixture
 def generate_test_data(request):
     _logger.info('Setup function: Test Run')
     test_path, test_name, test_params = generate_test_info(request.node)

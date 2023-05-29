@@ -4,7 +4,7 @@ from driver.system_path import SystemPath
 
 ROOT: SystemPath = SystemPath(__file__).resolve().parent.parent
 
-CURSOR_ANIMATION = int(os.getenv('CURSOR_ANIMATION', 0))
+CURSOR_ANIMATION = int(os.getenv('CURSOR_ANIMATION', 1))
 
 INSTALL_DIR = SystemPath(os.getenv('SQUISH_DIR'))
 SERVER = INSTALL_DIR / 'bin' / 'squishserver'
@@ -17,7 +17,7 @@ SERVER_HOST = os.getenv('SERVER_HOST', '127.0.0.1')
 SERVER_PORT = os.getenv('SERVER_PORT', 4322)
 
 PROCESS_TIMEOUT_SEC = 10
-APP_LOAD_TIMEOUT_MSEC = 60000
+APP_LOAD_TIMEOUT_MSEC = 120000
 UI_LOAD_TIMEOUT_MSEC = 5000
 
 # Limit of multiple instances

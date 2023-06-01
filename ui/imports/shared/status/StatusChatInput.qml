@@ -161,6 +161,8 @@ Rectangle {
             }
         }
 
+        property Menu textFormatMenu: null
+
         function copyMentions(start, end) {
             copiedMentionsPos = []
             for (let k = 0; k < mentionsPos.length; k++) {
@@ -322,7 +324,7 @@ Rectangle {
     property var mentionsPos: []
 
     function isUploadFilePressed(event) {
-        return (event.key === Qt.Key_U) && (event.modifiers & Qt.ControlModifier) && imageBtn.visible && !imageDialog.visible
+        return (event.key === Qt.Key_U) && (event.modifiers & Qt.ControlModifier) && imageBtn.visible && !imageBtn.highlighted
     }
 
     function checkTextInsert() {
@@ -353,7 +355,7 @@ Rectangle {
             }
             if (event) {
                 event.accepted = true
-                messageTooLongDialog.open()
+                console.error("Attempting to send a message exceeding length limit")
             }
         } else if (event.key === Qt.Key_Escape && control.isReply) {
             control.isReply = false
@@ -663,8 +665,8 @@ Rectangle {
         if ((event.modifiers & Qt.ControlModifier) || (event.modifiers & Qt.MetaModifier)) // these are likely shortcuts with no meaningful text
             return
 
-        if (event.key === Qt.Key_Backspace && textFormatMenu.opened) {
-            textFormatMenu.close()
+        if (event.key === Qt.Key_Backspace && d.textFormatMenu.opened) {
+            d.textFormatMenu.close()
         }
         // the text doesn't get registered to the textarea fast enough
         // we can only get it in the `released` event
@@ -962,30 +964,25 @@ Rectangle {
         messageInputField.forceActiveFocus();
     }
 
-    FileDialog {
-        id: imageDialog
-        title: qsTr("Please choose an image")
-        folder: shortcuts.pictures
-        selectMultiple: true
-        nameFilters: [
-            qsTr("Image files (%1)").arg(Constants.acceptedDragNDropImageExtensions.map(img => "*" + img).join(" "))
-        ]
-        onAccepted: {
-            imageBtn.highlighted = false
-            validateImagesAndShowImageArea(imageDialog.fileUrls)
-            messageInputField.forceActiveFocus();
-        }
-        onRejected: {
-            imageBtn.highlighted = false
-        }
-    }
+    Component {
+        id: imageDialogComponent
 
-    MessageDialog {
-        id: messageTooLongDialog
-        title: qsTr("Your message is too long.")
-        icon: StandardIcon.Critical
-        text: qsTr("Please make your message shorter. We have set the limit to 2000 characters to be courteous of others.")
-        standardButtons: StandardButton.Ok
+        FileDialog {
+            title: qsTr("Please choose an image")
+            folder: shortcuts.pictures
+            selectMultiple: true
+            nameFilters: [
+                qsTr("Image files (%1)").arg(Constants.acceptedDragNDropImageExtensions.map(img => "*" + img).join(" "))
+            ]
+            onAccepted: {
+                imageBtn.highlighted = false
+                validateImagesAndShowImageArea(fileUrls)
+                messageInputField.forceActiveFocus()
+            }
+            onRejected: {
+                imageBtn.highlighted = false
+            }
+        }
     }
 
     StatusEmojiSuggestionPopup {
@@ -1025,43 +1022,58 @@ Rectangle {
         }
     }
 
-    ChatCommandsPopup {
-        id: chatCommandsPopup
-        x: 8
-        y: -height
-        onSendTransactionCommandButtonClicked: {
-            control.sendTransactionCommandButtonClicked()
-            chatCommandsPopup.close()
-        }
-        onReceiveTransactionCommandButtonClicked: {
-            control.receiveTransactionCommandButtonClicked()
-            chatCommandsPopup.close()
-        }
-        onClosed: {
-            chatCommandsBtn.highlighted = false
-        }
-        onOpened: {
-            chatCommandsBtn.highlighted = true
+    Component {
+        id: chatCommandsPopupComponent
+
+        ChatCommandsPopup {
+            id: chatCommandsPopup
+            x: 8
+            y: -height
+            onSendTransactionCommandButtonClicked: {
+                control.sendTransactionCommandButtonClicked()
+                close()
+            }
+            onReceiveTransactionCommandButtonClicked: {
+                control.receiveTransactionCommandButtonClicked()
+                close()
+            }
+            onClosed: {
+                chatCommandsBtn.highlighted = false
+                destroy()
+            }
+            onOpened: {
+                chatCommandsBtn.highlighted = true
+            }
         }
     }
 
-    StatusGifPopup {
-        id: gifPopup
-        width: 360
-        height: 440
-        x: control.width - width - Style.current.halfPadding
-        y: -height
-        gifSelected: function (event, url) {
-            messageInputField.text += "\n" + url
-            control.sendMessage(event)
-            control.isReply = false
-            gifBtn.highlighted = false
-            messageInputField.forceActiveFocus()
-            if (control.closeGifPopupAfterSelection)
-                gifPopup.close()
-        }
-        onClosed: {
-            gifBtn.highlighted = false
+    Component {
+        id: gifPopupComponent
+
+        StatusGifPopup {
+            id: gifPopup
+            width: 360
+            height: 440
+            x: control.width - width - Style.current.halfPadding
+            y: -height
+
+            gifSelected: function (event, url) {
+                messageInputField.text += "\n" + url
+                control.sendMessage(event)
+                control.isReply = false
+                messageInputField.forceActiveFocus()
+                if (control.closeGifPopupAfterSelection)
+                    close()
+            }
+            onOpened: {
+                console.log("<<< gifPopup opened")
+                gifBtn.highlighted = true
+            }
+            onClosed: {
+                console.log("<<< gifPopup closed")
+                gifBtn.highlighted = false
+                destroy()
+            }
         }
     }
 
@@ -1081,9 +1093,10 @@ Rectangle {
             visible: RootStore.isWalletEnabled && !isEdit && control.chatType === Constants.chatType.oneToOne
             enabled: !control.isContactBlocked
             onClicked: {
-                chatCommandsPopup.opened ?
-                            chatCommandsPopup.close() :
-                            chatCommandsPopup.open()
+                if (highlighted)
+                    return
+                const popup = chatCommandsPopupComponent.createObject(this)
+                popup.open()
             }
         }
 
@@ -1099,7 +1112,8 @@ Rectangle {
             enabled: !control.isContactBlocked
             onClicked: {
                 highlighted = true
-                imageDialog.open()
+                const popup = imageDialogComponent.createObject(control)
+                popup.open()
             }
         }
 
@@ -1118,60 +1132,67 @@ Rectangle {
             color: isEdit ? Theme.palette.statusChatInput.secondaryBackgroundColor : Style.current.inputBackground
             radius: 20
 
-            StatusTextFormatMenu {
-                id: textFormatMenu
+            Component {
+                id: textFormatMenuComponent
 
-                StatusChatInputTextFormationAction {
-                    wrapper: "**"
-                    icon.name: "bold"
-                    text: qsTr("Bold")
-                    selectedTextWithFormationChars: RootStore.getSelectedTextWithFormationChars(messageInputField)
-                    onActionTriggered: checked ?
-                                           unwrapSelection(wrapper, RootStore.getSelectedTextWithFormationChars(messageInputField)) :
-                                           wrapSelection(wrapper)
-                }
-                StatusChatInputTextFormationAction {
-                    wrapper: "*"
-                    icon.name: "italic"
-                    text: qsTr("Italic")
-                    selectedTextWithFormationChars: RootStore.getSelectedTextWithFormationChars(messageInputField)
-                    checked: (surroundedBy("*") && !surroundedBy("**")) || surroundedBy("***")
-                    onActionTriggered: checked ?
-                                           unwrapSelection(wrapper, RootStore.getSelectedTextWithFormationChars(messageInputField)) :
-                                           wrapSelection(wrapper)
-                }
-                StatusChatInputTextFormationAction {
-                    wrapper: "~~"
-                    icon.name: "strikethrough"
-                    text: qsTr("Strikethrough")
-                    selectedTextWithFormationChars: RootStore.getSelectedTextWithFormationChars(messageInputField)
-                    onActionTriggered: checked ?
-                                           unwrapSelection(wrapper, RootStore.getSelectedTextWithFormationChars(messageInputField)) :
-                                           wrapSelection(wrapper)
-                }
-                StatusChatInputTextFormationAction {
-                    wrapper: "`"
-                    icon.name: "code"
-                    text: qsTr("Code")
-                    selectedTextWithFormationChars: RootStore.getSelectedTextWithFormationChars(messageInputField)
-                    onActionTriggered: checked ?
-                                           unwrapSelection(wrapper, RootStore.getSelectedTextWithFormationChars(messageInputField)) :
-                                           wrapSelection(wrapper)
-                }
-                StatusChatInputTextFormationAction {
-                    wrapper: "> "
-                    icon.name: "quote"
-                    text: qsTr("Quote")
-                    checked: messageInputField.selectedText && isSelectedLinePrefixedBy(messageInputField.selectionStart, wrapper)
+                StatusTextFormatMenu {
+                    id: textFormatMenu
 
-                    onActionTriggered: checked
-                                       ? unprefixSelectedLine(wrapper)
-                                       : prefixSelectedLine(wrapper)
-                }
-                onClosed: {
-                    messageInputField.deselect();
+                    onClosed: {
+                        messageInputField.deselect()
+                        destroy()
+                    }
+
+                    StatusChatInputTextFormationAction {
+                        wrapper: "**"
+                        icon.name: "bold"
+                        text: qsTr("Bold")
+                        selectedTextWithFormationChars: RootStore.getSelectedTextWithFormationChars(messageInputField)
+                        onActionTriggered: checked ?
+                                               unwrapSelection(wrapper, RootStore.getSelectedTextWithFormationChars(messageInputField)) :
+                                               wrapSelection(wrapper)
+                    }
+                    StatusChatInputTextFormationAction {
+                        wrapper: "*"
+                        icon.name: "italic"
+                        text: qsTr("Italic")
+                        selectedTextWithFormationChars: RootStore.getSelectedTextWithFormationChars(messageInputField)
+                        checked: (surroundedBy("*") && !surroundedBy("**")) || surroundedBy("***")
+                        onActionTriggered: checked ?
+                                               unwrapSelection(wrapper, RootStore.getSelectedTextWithFormationChars(messageInputField)) :
+                                               wrapSelection(wrapper)
+                    }
+                    StatusChatInputTextFormationAction {
+                        wrapper: "~~"
+                        icon.name: "strikethrough"
+                        text: qsTr("Strikethrough")
+                        selectedTextWithFormationChars: RootStore.getSelectedTextWithFormationChars(messageInputField)
+                        onActionTriggered: checked ?
+                                               unwrapSelection(wrapper, RootStore.getSelectedTextWithFormationChars(messageInputField)) :
+                                               wrapSelection(wrapper)
+                    }
+                    StatusChatInputTextFormationAction {
+                        wrapper: "`"
+                        icon.name: "code"
+                        text: qsTr("Code")
+                        selectedTextWithFormationChars: RootStore.getSelectedTextWithFormationChars(messageInputField)
+                        onActionTriggered: checked ?
+                                               unwrapSelection(wrapper, RootStore.getSelectedTextWithFormationChars(messageInputField)) :
+                                               wrapSelection(wrapper)
+                    }
+                    StatusChatInputTextFormationAction {
+                        wrapper: "> "
+                        icon.name: "quote"
+                        text: qsTr("Quote")
+                        checked: messageInputField.selectedText && isSelectedLinePrefixedBy(messageInputField.selectionStart, wrapper)
+
+                        onActionTriggered: checked
+                                           ? unprefixSelectedLine(wrapper)
+                                           : prefixSelectedLine(wrapper)
+                    }
                 }
             }
+
             ColumnLayout {
                 id: validators
                 anchors.bottom: control.imageErrorMessageLocation === StatusChatInput.ImageErrorMessageLocation.Top ? parent.top : undefined
@@ -1346,12 +1367,14 @@ Rectangle {
                                 if (messageInputField.selectedText.trim() !== "") {
                                     // If it's a double click, just check the mouse position
                                     // If it's a mouse select, use the start and end position average)
-                                    let x = now < messageInputField.lastClick + 500 ? x = event.x :
-                                                                                      (messageInputField.cursorRectangle.x + event.x) / 2
-                                    x -= textFormatMenu.width / 2
-
-                                    textFormatMenu.popup(x, messageInputField.y - textFormatMenu.height - 5)
-                                    messageInputField.forceActiveFocus();
+                                    const x = now < messageInputField.lastClick + 500
+                                            ? event.x
+                                            : (messageInputField.cursorRectangle.x + event.x) / 2
+                                    let menu = Global.openMenu(textFormatMenuComponent, messageInput, {})
+                                    menu.x = x - menu.width / 2
+                                    menu.y = messageInputField.y - menu.height - 5
+                                    d.textFormatMenu = menu
+                                    messageInputField.forceActiveFocus()
                                 }
                                 lastClick = now
                             }
@@ -1471,7 +1494,12 @@ Rectangle {
                                                                      : Theme.palette.baseColor1
                                 type: StatusQ.StatusFlatRoundButton.Type.Tertiary
                                 color: "transparent"
-                                onClicked: togglePopup(gifPopup, gifBtn)
+                                onClicked: {
+                                    if (highlighted)
+                                        return
+                                    const popup = gifPopupComponent.createObject(control)
+                                    popup.open()
+                                }
                             }
 
                             StatusQ.StatusFlatRoundButton {
@@ -1498,14 +1526,17 @@ Rectangle {
             }
         }
 
-        StatusQ.StatusButton {
-            id: unblockBtn
+        Loader {
             Layout.alignment: Qt.AlignBottom
             Layout.bottomMargin: 4
             visible: control.isContactBlocked
-            text: qsTr("Unblock")
-            type: StatusQ.StatusBaseButton.Type.Danger
-            onClicked: control.unblockChat()
+            active: visible
+
+            StatusQ.StatusButton {
+                text: qsTr("Unblock")
+                type: StatusQ.StatusBaseButton.Type.Danger
+                onClicked: control.unblockChat()
+            }
         }
     }
 }

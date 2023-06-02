@@ -43,3 +43,10 @@ proc toOnlineStatus*(statusType: StatusType): OnlineStatus =
     return OnlineStatus.Online
   else:
     return OnlineStatus.Inactive
+
+type MemberRole* {.pure} = enum
+  None = 0
+  Owner
+  ManageUsers
+  ModerateContent
+  Admin

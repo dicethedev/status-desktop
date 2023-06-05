@@ -18,10 +18,16 @@ pytest_plugins = [
 @pytest.fixture(scope='session', autouse=True)
 def setup_session_scope(
         terminate_old_processes,
-        server,  # prepares driver server config, starts/stops driver server
         run_dir,  # adds test directories, clears temp data, and fills configs
 ):
     _logger.info('Setup session: Done')
+
+
+@pytest.fixture(scope='function', autouse=True)
+def setup_test_scope(
+        server,  # prepares driver server config, starts/stops driver server
+):
+    _logger.info('Setup test: Done')
 
 
 def pytest_exception_interact(node):

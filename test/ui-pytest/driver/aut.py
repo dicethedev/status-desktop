@@ -1,10 +1,6 @@
-import signal
-import subprocess
-
 import squish
 
 from driver import settings, server, context, system_path, local_system
-from gui.elements.base_window import BaseWindow
 
 
 class ApplicationLauncher:
@@ -56,8 +52,12 @@ class ApplicationLauncher:
             local_system.execute(command)
         else:
             command = [self.app_path.stem] + list(args)
-            self.ctx = squish.startApplication(' '.join(command), driver.settings.SERVER_HOST, driver.settings.SERVER_PORT, settings.APP_LOAD_TIMEOUT_MSEC)
+            self.ctx = squish.startApplication(
+                ' '.join(command),
+                settings.SERVER_HOST,
+                settings.SERVER_PORT,
+                settings.APP_LOAD_TIMEOUT_MSEC
+            )
         self.attach()
-
         assert squish.waitFor(lambda: self.ctx.isRunning, settings.APP_LOAD_TIMEOUT_MSEC)
         return self

@@ -1,11 +1,12 @@
+import time
+
 import pytest
 
 import driver
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope='function')
 def server():
-    driver.server.stop()
     driver.server.start()
     driver.server.prepare_config()
     yield

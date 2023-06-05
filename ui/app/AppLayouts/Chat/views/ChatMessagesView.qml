@@ -250,7 +250,6 @@ Item {
             chatLogView: ListView.view
             chatContentModule: root.chatContentModule
 
-            isActiveChannel: root.isActiveChannel
             isChatBlocked: root.isChatBlocked
 
             chatId: root.chatId

@@ -30,7 +30,6 @@ ColumnLayout {
     property var chatSectionModule
     property var rootStore
     property var contactsStore
-    property bool isActiveChannel: false
     property string chatId
     property int chatType: Constants.chatType.unknown
 
@@ -40,7 +39,6 @@ ColumnLayout {
     property var stickersPopup
     property UsersStore usersStore: UsersStore {}
 
-    signal openAppSearch()
     signal openStickerPackPopup(string stickerPackId)
 
     property bool isBlocked: false
@@ -90,7 +88,6 @@ ColumnLayout {
             isOneToOne: root.chatType === Constants.chatType.oneToOne
             isChatBlocked: root.isBlocked || !root.isUserAllowedToSendMessage
             channelEmoji: !chatContentModule ? "" : (chatContentModule.chatDetails.emoji || "")
-            isActiveChannel: root.isActiveChannel
             onShowReplyArea: (messageId, senderId) => {
                 root.showReplyArea(messageId)
             }

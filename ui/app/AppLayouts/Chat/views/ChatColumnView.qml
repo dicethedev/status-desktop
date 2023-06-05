@@ -42,7 +42,6 @@ Item {
     readonly property var contactDetails: rootStore ? rootStore.oneToOneChatContact : null
     readonly property bool isUserAdded: root.contactDetails && root.contactDetails.isAdded
 
-    signal openAppSearch()
     signal openStickerPackPopup(string stickerPackId)
 
     function requestAddressForTransaction(address, amount, tokenAddress, tokenDecimals = 18) {
@@ -226,17 +225,11 @@ Item {
                     contactsStore: root.contactsStore
                     emojiPopup: root.emojiPopup
                     stickersPopup: root.stickersPopup
-//                    sendTransactionNoEnsModal: cmpSendTransactionNoEns
-//                    receiveTransactionModal: cmpReceiveTransaction
-//                    sendTransactionWithEnsModal: cmpSendTransactionWithEns
                     stickersLoaded: root.stickersLoaded
                     isBlocked: model.blocked
                     isActiveChannel: model.active
                     onOpenStickerPackPopup: {
                         root.openStickerPackPopup(stickerPackId)
-                    }
-                    onOpenAppSearch: {
-                        root.openAppSearch();
                     }
                     onShowReplyArea: (messageId) => {
                         d.showReplyArea(messageId)

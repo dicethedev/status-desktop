@@ -84,9 +84,7 @@ ColumnLayout {
             if (!obj) {
                 return
             }
-            if (inputAreaLoader.item) {
-                inputAreaLoader.item.chatInput.showReplyArea(messageId, obj.senderDisplayName, obj.messageText, obj.contentType, obj.messageImage, obj.albumMessageImages, obj.albumImagesCount, obj.sticker)
-            }
+            chatInput.chatInput.showReplyArea(messageId, obj.senderDisplayName, obj.messageText, obj.contentType, obj.messageImage, obj.albumMessageImages, obj.albumImagesCount, obj.sticker)
         }
     }
 
@@ -122,131 +120,106 @@ ColumnLayout {
                     root.openStickerPackPopup(stickerPackId);
                 }
                 onEditModeChanged: {
-                    if (!editModeOn && inputAreaLoader.item)
-                        inputAreaLoader.item.chatInput.forceInputActiveFocus()
+                    if (!editModeOn)
+                        chatInput.chatInput.forceInputActiveFocus()
                 }
             }
         }
 
-        Loader {
-            id: inputAreaLoader
+        Item {
+            id: inputArea
 
             Layout.alignment: Qt.AlignHCenter | Qt.AlignBottom
             Layout.fillWidth: true
+            implicitHeight: chatInput.implicitHeight
+                            + chatInput.anchors.topMargin
+                            + chatInput.anchors.bottomMargin
 
-            active: root.isActiveChannel
-            asynchronous: true
+            readonly property alias chatInput: chatInput
 
-            property string preservedText
-            Binding on preservedText {
-                when: inputAreaLoader.item != null
-                value: inputAreaLoader.item ? inputAreaLoader.item.chatInput.textInput.text : inputAreaLoader.preservedText
-                restoreMode: Binding.RestoreNone
-                delayed: true
-            }
+            StatusChatInput {
+                id: chatInput
 
-            // FIXME: `StatusChatInput` is way too heavy
-            // see: https://github.com/status-im/status-desktop/pull/10343#issuecomment-1515103756
-            sourceComponent: Item {
-                id: inputArea
-                implicitHeight: chatInput.implicitHeight
-                                + chatInput.anchors.topMargin
-                                + chatInput.anchors.bottomMargin
+                anchors.fill: parent
+                anchors.margins: Style.current.smallPadding
 
-                readonly property alias chatInput: chatInput
+                // We enable the component if the contact is blocked, because if we disable it, the `Unban` button
+                // becomes disabled. All the local components inside already disable themselves when blocked
+                enabled: root.isBlocked ||
+                        (root.rootStore.sectionDetails.joined && !root.rootStore.sectionDetails.amIBanned &&
+                         root.isUserAllowedToSendMessage)
 
-                StatusChatInput {
-                    id: chatInput
+                store: root.rootStore
+                usersStore: root.usersStore
 
-                    anchors.fill: parent
-                    anchors.margins: Style.current.smallPadding
+                textInput.placeholderText: root.isBlocked ? d.blockedText : root.chatInputPlaceholder
+                emojiPopup: root.emojiPopup
+                stickersPopup: root.stickersPopup
+                isContactBlocked: root.isBlocked
+                isActiveChannel: root.isActiveChannel
+                anchors.bottom: parent.bottom
+                chatType: root.chatType
+                suggestions.suggestionFilter.addSystemSuggestions: chatType === Constants.chatType.communityChat
 
-                    // We enable the component if the contact is blocked, because if we disable it, the `Unban` button
-                    // becomes disabled. All the local components inside already disable themselves when blocked
-                    enabled: root.isBlocked ||
-                            (root.rootStore.sectionDetails.joined && !root.rootStore.sectionDetails.amIBanned &&
-                             root.isUserAllowedToSendMessage)
+                Binding on chatInputPlaceholder {
+                    when: root.isBlocked
+                    value: d.blockedText
+                }
 
-                    store: root.rootStore
-                    usersStore: root.usersStore
+                Binding on chatInputPlaceholder {
+                    when: !root.rootStore.sectionDetails.joined || root.rootStore.sectionDetails.amIBanned
+                    value: qsTr("You need to join this community to send messages")
+                }
 
-                    textInput.text: inputAreaLoader.preservedText
-                    textInput.placeholderText: root.isBlocked ? d.blockedText : root.chatInputPlaceholder
-                    emojiPopup: root.emojiPopup
-                    stickersPopup: root.stickersPopup
-                    isContactBlocked: root.isBlocked
-                    isActiveChannel: root.isActiveChannel
-                    anchors.bottom: parent.bottom
-                    chatType: root.chatType
-                    suggestions.suggestionFilter.addSystemSuggestions: chatType === Constants.chatType.communityChat
-
-                    Binding on chatInputPlaceholder {
-                        when: root.isBlocked
-                        value: d.blockedText
+                onSendTransactionCommandButtonClicked: {
+                    if(!chatContentModule) {
+                        console.debug("error on sending transaction command - chat content module is not set")
+                        return
                     }
 
-                    Binding on chatInputPlaceholder {
-                        when: !root.rootStore.sectionDetails.joined || root.rootStore.sectionDetails.amIBanned
-                        value: qsTr("You need to join this community to send messages")
-                    }
-
-                    onSendTransactionCommandButtonClicked: {
-                        if(!chatContentModule) {
-                            console.debug("error on sending transaction command - chat content module is not set")
-                            return
-                        }
-
-                        if (Utils.isEnsVerified(chatContentModule.getMyChatId())) {
-                            Global.openPopup(root.sendTransactionWithEnsModal)
-                        } else {
-                            Global.openPopup(root.sendTransactionNoEnsModal)
-                        }
-                    }
-                    onReceiveTransactionCommandButtonClicked: {
-                        Global.openPopup(root.receiveTransactionModal)
-                    }
-                    onStickerSelected: {
-                        root.rootStore.sendSticker(chatContentModule.getMyChatId(),
-                                                              hashId,
-                                                              chatInput.isReply ? chatInput.replyMessageId : "",
-                                                              packId,
-                                                              url)
-                    }
-
-
-                    onSendMessage: {
-                        if (!chatContentModule) {
-                            console.debug("error on sending message - chat content module is not set")
-                            return
-                        }
-
-                        if(root.rootStore.sendMessage(chatContentModule.getMyChatId(),
-                                                      event,
-                                                      chatInput.getTextWithPublicKeys(),
-                                                      chatInput.isReply? chatInput.replyMessageId : "",
-                                                      chatInput.fileUrlsAndSources
-                                                      ))
-                        {
-                            Global.playSendMessageSound()
-
-                            chatInput.textInput.clear();
-                            chatInput.textInput.textFormat = TextEdit.PlainText;
-                            chatInput.textInput.textFormat = TextEdit.RichText;
-                        }
-                    }
-
-                    onUnblockChat: {
-                        chatContentModule.unblockChat()
-                    }
-                    onKeyUpPress: messageStore.setEditModeOnLastMessage(root.rootStore.userProfileInst.pubKey)
-
-                    Component.onCompleted: {
-                        Qt.callLater(() => {
-                            forceInputActiveFocus()
-                            textInput.cursorPosition = textInput.length
-                        })
+                    if (Utils.isEnsVerified(chatContentModule.getMyChatId())) {
+                        Global.openPopup(root.sendTransactionWithEnsModal)
+                    } else {
+                        Global.openPopup(root.sendTransactionNoEnsModal)
                     }
                 }
+                onReceiveTransactionCommandButtonClicked: {
+                    Global.openPopup(root.receiveTransactionModal)
+                }
+                onStickerSelected: {
+                    root.rootStore.sendSticker(chatContentModule.getMyChatId(),
+                                                          hashId,
+                                                          chatInput.isReply ? chatInput.replyMessageId : "",
+                                                          packId,
+                                                          url)
+                }
+
+
+                onSendMessage: {
+                    if (!chatContentModule) {
+                        console.debug("error on sending message - chat content module is not set")
+                        return
+                    }
+
+                    if(root.rootStore.sendMessage(chatContentModule.getMyChatId(),
+                                                  event,
+                                                  chatInput.getTextWithPublicKeys(),
+                                                  chatInput.isReply? chatInput.replyMessageId : "",
+                                                  chatInput.fileUrlsAndSources
+                                                  ))
+                    {
+                        Global.playSendMessageSound()
+
+                        chatInput.textInput.clear();
+                        chatInput.textInput.textFormat = TextEdit.PlainText;
+                        chatInput.textInput.textFormat = TextEdit.RichText;
+                    }
+                }
+
+                onUnblockChat: {
+                    chatContentModule.unblockChat()
+                }
+                onKeyUpPress: messageStore.setEditModeOnLastMessage(root.rootStore.userProfileInst.pubKey)
             }
         }
     }

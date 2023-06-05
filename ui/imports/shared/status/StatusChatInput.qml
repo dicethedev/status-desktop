@@ -43,12 +43,11 @@ Rectangle {
     property bool emojiEvent: false
     property bool isColonPressed: false
     property bool isReply: false
-    property string replyMessageId: replyArea.messageId
+    readonly property string replyMessageId: replyArea.messageId
 
     property bool isImage: false
     property bool isEdit: false
     property bool isContactBlocked: false
-    property bool isActiveChannel: false
 
     property int messageLimit: 2000
     property int messageLimitVisible: 200
@@ -884,17 +883,25 @@ Rectangle {
         return true;
     }
 
-    function hideExtendedArea() {
+    function resetImageArea() {
         isImage = false;
-        isReply = false;
         control.fileUrlsAndSources = []
         imageArea.imageSource = [];
-        replyArea.userName = ""
-        replyArea.message = ""
         for (let i=0; i<validators.children.length; i++) {
             const validator = validators.children[i]
             validator.images = []
         }
+    }
+
+    function resetReplyArea() {
+        isReply = false;
+        replyArea.userName = ""
+        replyArea.message = ""
+    }
+
+    function hideExtendedArea() {
+        resetImageArea()
+        resetReplyArea()
     }
 
     function validateImages(imagePaths) {
@@ -948,7 +955,6 @@ Rectangle {
     }
 
     Connections {
-        enabled: control.isActiveChannel
         target: Global.dragArea
         ignoreUnknownSignals: true
         function onDroppedOnValidScreen(drop) {
@@ -1066,11 +1072,9 @@ Rectangle {
                     close()
             }
             onOpened: {
-                console.log("<<< gifPopup opened")
                 gifBtn.highlighted = true
             }
             onClosed: {
-                console.log("<<< gifPopup closed")
                 gifBtn.highlighted = false
                 destroy()
             }
@@ -1253,7 +1257,7 @@ Rectangle {
                             control.fileUrlsAndSources.splice(index, 1)
                         }
                         isImage = control.fileUrlsAndSources.length > 0
-                        validateImages(control.fileUrlsAndSources)
+                        validateImagesAndShowImageArea(control.fileUrlsAndSources) // Explicitely assign control.fileUrlsAndSources to force the chagne signal
                     }
                 }
 
@@ -1526,17 +1530,13 @@ Rectangle {
             }
         }
 
-        Loader {
-            Layout.alignment: Qt.AlignBottom
+        StatusQ.StatusButton {
+            Layout.fillHeight: true
             Layout.bottomMargin: 4
             visible: control.isContactBlocked
-            active: visible
-
-            StatusQ.StatusButton {
-                text: qsTr("Unblock")
-                type: StatusQ.StatusBaseButton.Type.Danger
-                onClicked: control.unblockChat()
-            }
+            text: qsTr("Unblock")
+            type: StatusQ.StatusBaseButton.Type.Danger
+            onClicked: control.unblockChat()
         }
     }
 }

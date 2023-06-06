@@ -19,11 +19,17 @@ SettingsPageLayout {
 
     required property var membersModel
 
+    // JS object specifing fees for the airdrop operation, should be set to
+    // provide response to airdropFeesRequested signal.
+    // Refer CommunityNewAirdropView::airdropFees for details.
+    property var airdropFees: null
+
     property int viewWidth: 560 // by design
 
     signal airdropClicked(var airdropTokens, var addresses, var membersPubKeys)
-    signal navigateToMintTokenSettings
+    signal airdropFeesRequested(var contractKeysAndAmounts, var addresses)
 
+    signal navigateToMintTokenSettings
 
     function navigateBack() {
         stackManager.pop(StackView.Immediate)
@@ -104,13 +110,20 @@ SettingsPageLayout {
             collectiblesModel: root.collectiblesModel
             membersModel: root.membersModel
 
+            Binding on airdropFees {
+                value: root.airdropFees
+            }
+
             onAirdropClicked: {
                 root.airdropClicked(airdropTokens, addresses, membersPubKeys)
                 stackManager.clear(d.welcomeViewState, StackView.Immediate)
             }
             onNavigateToMintTokenSettings: root.navigateToMintTokenSettings()
 
-            Component.onCompleted: d.selectCollectible.connect(view.selectCollectible)
+            Component.onCompleted: {
+                d.selectCollectible.connect(view.selectCollectible)
+                airdropFeesRequested.connect(root.airdropFeesRequested)
+            }
         }
     }
 }

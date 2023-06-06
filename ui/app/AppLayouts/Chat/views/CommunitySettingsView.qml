@@ -476,6 +476,10 @@ StatusSectionLayout {
                 onAirdropClicked: communityTokensStore.airdrop(root.community.id, airdropTokens, addresses)
                 onNavigateToMintTokenSettings: root.goTo(Constants.CommunitySettingsSections.MintTokens)
 
+                onAirdropFeesRequested:
+                    communityTokensStore.computeAirdropFee(
+                        root.community.id, contractKeysAndAmounts, addresses)
+
                 Connections {
                     target: mintPanel
 
@@ -485,6 +489,14 @@ StatusSectionLayout {
 
                         // Force a token selection to be airdroped with default amount 1
                         airdropPanel.selectCollectible(key, 1)
+                    }
+                }
+
+                Connections {
+                    target: rootStore.communityTokensStore
+
+                    function onAirdropFeeUpdated(airdropFees) {
+                        airdropPanel.airdropFees = airdropFees
                     }
                 }
             }

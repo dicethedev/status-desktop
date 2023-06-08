@@ -20,7 +20,7 @@ type
   LocalPairingStatus* = ref object of Args
     mode*: LocalPairingMode
     state*: LocalPairingState
-    account*: AccountDTO
+    account*: AccountDto
     password*: string
     installation*: InstallationDto
     error*: string
@@ -42,7 +42,7 @@ proc newLocalPairingStatus*(): LocalPairingStatus =
   result.setup()
 
 proc update*(self: LocalPairingStatus, data: LocalPairingEventArgs) =
- 
+
   self.error = data.error
 
  # process any incoming data
@@ -65,7 +65,7 @@ proc update*(self: LocalPairingStatus, data: LocalPairingEventArgs) =
     return
 
   # Detect finished state
-  if (self.mode == LocalPairingMode.Sender and 
+  if (self.mode == LocalPairingMode.Sender and
       data.eventType == EventProcessSuccess and
       data.action == ActionPairingInstallation):
     self.state = LocalPairingState.Finished

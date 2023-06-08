@@ -23,7 +23,6 @@ StatusDialog {
     id: root
 
     property string password
-    property string keyUid
 
     property DevicesStore devicesStore
     property ProfileStore profileStore
@@ -53,7 +52,7 @@ StatusDialog {
             d.connectionString = ""
             d.errorMessage = ""
 
-            const result = root.devicesStore.getConnectionStringForBootstrappingAnotherDevice(root.keyUid, root.password)
+            const result = root.devicesStore.getConnectionStringForBootstrappingAnotherDevice(root.password)
 
             try {
                 const json = JSON.parse(result)

@@ -133,17 +133,17 @@ QtObject:
 
   # LocalPairing actions
 
-  proc userAuthenticated*(self: View, pin: string, password: string, keyUid: string) {.signal.}
-  proc emitUserAuthenticated*(self: View, pin: string, password: string, keyUid: string) =
-    self.userAuthenticated(pin, password, keyUid)
-  proc authenticateUser*(self: View, keyUid: string) {.slot.} =
-    self.delegate.authenticateUser(keyUid)
+  proc loggedInUserAuthenticated*(self: View, pin: string, password: string, keyUid: string) {.signal.}
+  proc emitLoggedInUserAuthenticated*(self: View, pin: string, password: string, keyUid: string) =
+    self.loggedInUserAuthenticated(pin, password, keyUid)
+  proc authenticateLoggedInUser*(self: View) {.slot.} =
+    self.delegate.authenticateLoggedInUser()
 
   proc validateConnectionString*(self: View, connectionString: string): string {.slot.} =
     return self.delegate.validateConnectionString(connectionString)
 
-  proc getConnectionStringForBootstrappingAnotherDevice*(self: View, keyUid: string, password: string): string {.slot.} =
-    return self.delegate.getConnectionStringForBootstrappingAnotherDevice(keyUid, password)
+  proc getConnectionStringForBootstrappingAnotherDevice*(self: View, password: string): string {.slot.} =
+    return self.delegate.getConnectionStringForBootstrappingAnotherDevice(password)
 
   proc inputConnectionStringForBootstrapping*(self: View, connectionString: string): string {.slot.} =
     return self.delegate.inputConnectionStringForBootstrapping(connectionString)

@@ -7,7 +7,7 @@ import ../../../../../app_service/service/devices/service as devices_service
 
 import ../../../shared_modules/keycard_popup/io_interface as keycard_shared_module
 
-const UNIQUE_SYNCING_SECTION_ACCOUNTS_MODULE_AUTH_IDENTIFIER* = "SyncingSection-AccountsModule-Authentication"
+const UNIQUE_SYNCING_LOGGED_IN_USER_AUTHENTICATION_IDENTIFIER* = "Syncing-LoggedInUser-Authentication"
 
 logScope:
   topics = "profile-section-devices-module-controller"
@@ -43,16 +43,16 @@ proc init*(self: Controller) =
   self.events.on(SIGNAL_UPDATE_DEVICE) do(e: Args):
     let args = UpdateInstallationArgs(e)
     self.delegate.updateOrAddDevice(args.installation)
-    
+
   self.events.on(SIGNAL_INSTALLATION_NAME_UPDATED) do(e: Args):
     let args = UpdateInstallationNameArgs(e)
     self.delegate.updateInstallationName(args.installationId, args.name)
-    
+
   self.events.on(SIGNAL_SHARED_KEYCARD_MODULE_USER_AUTHENTICATED) do(e: Args):
     let args = SharedKeycarModuleArgs(e)
-    if args.uniqueIdentifier != UNIQUE_SYNCING_SECTION_ACCOUNTS_MODULE_AUTH_IDENTIFIER:
+    if args.uniqueIdentifier != UNIQUE_SYNCING_LOGGED_IN_USER_AUTHENTICATION_IDENTIFIER:
       return
-    self.delegate.onUserAuthenticated(args.pin, args.password, args.keyUid)
+    self.delegate.onLoggedInUserAuthenticated(args.pin, args.password, args.keyUid)
 
   self.events.on(SIGNAL_LOCAL_PAIRING_EVENT) do(e: Args):
     let args = LocalPairingEventArgs(e)
@@ -91,10 +91,10 @@ proc enableDevice*(self: Controller, deviceId: string, enable: bool) =
 # Pairing status
 #
 
-proc authenticateUser*(self: Controller, keyUid: string) =
+proc authenticateLoggedInUser*(self: Controller) =
   let data = SharedKeycarModuleAuthenticationArgs(
-    uniqueIdentifier: UNIQUE_SYNCING_SECTION_ACCOUNTS_MODULE_AUTH_IDENTIFIER,
-    keyUid: keyUid)
+    uniqueIdentifier: UNIQUE_SYNCING_LOGGED_IN_USER_AUTHENTICATION_IDENTIFIER
+  )
   self.events.emit(SIGNAL_SHARED_KEYCARD_MODULE_AUTHENTICATE_USER, data)
 
 #
@@ -104,8 +104,8 @@ proc authenticateUser*(self: Controller, keyUid: string) =
 proc validateConnectionString*(self: Controller, connectionString: string): string =
   return self.devicesService.validateConnectionString(connectionString)
 
-proc getConnectionStringForBootstrappingAnotherDevice*(self: Controller, keyUid: string, password: string): string =
-  return self.devicesService.getConnectionStringForBootstrappingAnotherDevice(keyUid, password)
+proc getConnectionStringForBootstrappingAnotherDevice*(self: Controller, password: string): string =
+  return self.devicesService.getConnectionStringForBootstrappingAnotherDevice(password)
 
 proc inputConnectionStringForBootstrapping*(self: Controller, connectionString: string): string =
   return self.devicesService.inputConnectionStringForBootstrapping(connectionString)

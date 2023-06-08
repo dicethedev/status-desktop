@@ -6,17 +6,17 @@ import ./dto/installation as Installation_dto
 import ./dto/local_pairing_event
 import ./dto/local_pairing_status
 
-import ../settings/service as settings_service
-import ../accounts/service as accounts_service
+import app_service/service/settings/service as settings_service
+import app_service/service/accounts/service as accounts_service
 
-import ../../../app/global/global_singleton
-import ../../../app/core/[main]
-import ../../../app/core/signals/types
-import ../../../app/core/eventemitter
-import ../../../app/core/tasks/[qt, threadpool]
-import ../../../backend/installations as status_installations
-import ../../common/utils as utils
-import ../../../constants as main_constants
+import app/global/global_singleton
+import app/core/[main]
+import app/core/signals/types
+import app/core/eventemitter
+import app/core/tasks/[qt, threadpool]
+import backend/installations as status_installations
+import app_service/common/utils as utils
+import constants as main_constants
 
 import status_go
 
@@ -62,7 +62,7 @@ QtObject:
     self.QObject.delete
     self.localPairingStatus.delete
 
-  proc newService*(events: EventEmitter, 
+  proc newService*(events: EventEmitter,
                   threadpool: ThreadPool,
                   settingsService: settings_service.Service,
                   accountsService: accounts_service.Service): Service =
@@ -176,13 +176,20 @@ QtObject:
   proc validateConnectionString*(self: Service, connectionString: string): string =
     return status_go.validateConnectionString(connectionString)
 
-  proc getConnectionStringForBootstrappingAnotherDevice*(self: Service, keyUid: string, password: string): string =
+  proc getConnectionStringForBootstrappingAnotherDevice*(self: Service, password: string): string =
+    let keyUid = singletonInstance.userProfile.getKeyUid()
+    let keycardUser = singletonInstance.userProfile.getIsKeycardUser()
+    var finalPassword = password
+    if not keycardUser:
+      finalPassword = utils.hashPassword(password)
+
     let configJSON = %* {
       "senderConfig": %* {
         "keystorePath": joinPath(main_constants.ROOTKEYSTOREDIR, keyUid),
         "deviceType": hostOs,
         "keyUID": keyUid,
-        "password": utils.hashPassword(password),
+        "password": finalPassword,
+        "chatKey": "4b2d6336291f4b6809ff51b88e9ba3dede8bec6053afa89eb79503998b0812aa", # set only in case of keycard user, refers to whisper.privateKey
       },
       "serverConfig": %* {
         "timeout": 5 * 60 * 1000,
@@ -207,6 +214,10 @@ QtObject:
     }
     self.localPairingStatus.reset()
     self.localPairingStatus.mode = LocalPairingMode.Receiver
+
+    echo "inputConnectionStringForBootstrapping - connectionString: ", connectionString
+    echo "inputConnectionStringForBootstrapping - self.localPairingStatus: ", repr(self.localPairingStatus)
+    echo "inputConnectionStringForBootstrapping - configJSON: ", $configJSON
 
     let arg = AsyncInputConnectionStringArg(
       tptr: cast[ByteAddress](asyncInputConnectionStringTask),

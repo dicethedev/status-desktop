@@ -77,7 +77,7 @@ method getModuleAsVariant*(self: Module): QVariant =
 
 method setInstallationName*(self: Module, installationId: string, name: string) =
   self.controller.setInstallationName(installationId, name)
-  
+
 method syncAllDevices*(self: Module) =
   self.controller.syncAllDevices()
 
@@ -97,17 +97,17 @@ method updateOrAddDevice*(self: Module, installation: InstallationDto) =
 method updateInstallationName*(self: Module, installationId: string, name: string) =
   self.view.model().updateItemName(installationId, name)
 
-method authenticateUser*(self: Module, keyUid: string) =
-  self.controller.authenticateUser(keyUid)
+method authenticateLoggedInUser*(self: Module) =
+  self.controller.authenticateLoggedInUser()
 
-method onUserAuthenticated*(self: Module, pin: string, password: string, keyUid: string) =
-  self.view.emitUserAuthenticated(pin, password, keyUid)
+method onLoggedInUserAuthenticated*(self: Module, pin: string, password: string, keyUid: string) =
+  self.view.emitLoggedInUserAuthenticated(pin, password, keyUid)
 
 proc validateConnectionString*(self: Module, connectionString: string): string =
   return self.controller.validateConnectionString(connectionString)
 
-method getConnectionStringForBootstrappingAnotherDevice*(self: Module, keyUid: string, password: string): string =
-  return self.controller.getConnectionStringForBootstrappingAnotherDevice(keyUid, password)
+method getConnectionStringForBootstrappingAnotherDevice*(self: Module, password: string): string =
+  return self.controller.getConnectionStringForBootstrappingAnotherDevice(password)
 
 method inputConnectionStringForBootstrapping*(self: Module, connectionString: string): string =
   return self.controller.inputConnectionStringForBootstrapping(connectionString)

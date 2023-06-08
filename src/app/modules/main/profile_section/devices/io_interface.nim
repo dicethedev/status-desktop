@@ -50,16 +50,16 @@ method advertise*(self: AccessInterface) {.base.} =
 method enableDevice*(self: AccessInterface, installationId: string, enable: bool) {.base.} =
   raise newException(ValueError, "No implementation available")
 
-method authenticateUser*(self: AccessInterface, keyUid: string) {.base.} =
+method authenticateLoggedInUser*(self: AccessInterface) {.base.} =
   raise newException(ValueError, "No implementation available")
 
-method onUserAuthenticated*(self: AccessInterface, pin: string, password: string, keyUid: string) {.base.} =
+method onLoggedInUserAuthenticated*(self: AccessInterface, pin: string, password: string, keyUid: string) {.base.} =
   raise newException(ValueError, "No implementation available")
 
 proc validateConnectionString*(self: AccessInterface, connectionString: string): string =
   raise newException(ValueError, "No implementation available")
 
-method getConnectionStringForBootstrappingAnotherDevice*(self: AccessInterface, keyUid: string, password: string): string {.base.} =
+method getConnectionStringForBootstrappingAnotherDevice*(self: AccessInterface, password: string): string {.base.} =
   raise newException(ValueError, "No implementation available")
 
 method inputConnectionStringForBootstrapping*(self: AccessInterface, connectionString: string): string {.base.} =

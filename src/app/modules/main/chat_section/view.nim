@@ -5,6 +5,8 @@ import ../../shared_models/user_model as user_model
 import ../../shared_models/token_permissions_model
 import ../../shared_models/token_list_model
 import ../../shared_models/token_list_item
+import ../../shared_models/token_permission_channels_model
+import ../../shared_models/token_permission_channel_item
 import io_interface
 
 QtObject:
@@ -29,6 +31,8 @@ QtObject:
       tokenListModelVariant: QVariant
       collectiblesListModel: TokenListModel
       collectiblesListModelVariant: QVariant
+      tokenPermissionChannelsModel: TokenPermissionChannelsModel
+      tokenPermissionChannelsModelVariant: QVariant
       allTokenRequirementsMet: bool
       requiresTokenPermissionToJoin: bool
       amIMember: bool
@@ -75,6 +79,8 @@ QtObject:
     result.tokenListModelVariant = newQVariant(result.tokenListModel)
     result.collectiblesListModel = newTokenListModel()
     result.collectiblesListModelVariant = newQVariant(result.collectiblesListModel)
+    result.tokenPermissionChannelsModel = newTokenPermissionChannelsModel()
+    result.tokenPermissionChannelsModelVariant = newQVariant(result.tokenPermissionChannelsModel)
     result.amIMember = false
     result.requiresTokenPermissionToJoin = false
     result.chatsLoaded = false
@@ -391,6 +397,18 @@ QtObject:
 
   proc setCollectiblesListItems*(self: View, tokenListItems: seq[TokenListItem]) =
     self.collectiblesListModel.setItems(tokenListItems)
+
+  proc tokenPermissionChannelsModel*(self: View): TokenPermissionChannelsModel =
+    result = self.tokenPermissionChannelsModel
+
+  proc getTokenPermissionChannelsModel(self: View): QVariant{.slot.} =
+    return self.tokenPermissionChannelsModelVariant
+
+  QtProperty[QVariant] channelsModel:
+    read = getTokenPermissionChannelsModel
+
+  proc setTokenPermissionChannelsItems*(self: View, channelItems: seq[TokenPermissionChannelItem]) =
+    self.tokenPermissionChannelsModel.setItems(channelItems)
 
   proc tokenPermissionsModel*(self: View): TokenPermissionsModel =
     result = self.tokenPermissionsModel

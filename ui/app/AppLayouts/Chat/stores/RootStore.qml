@@ -55,6 +55,23 @@ QtObject {
         }
     }
 
+    property var foo: chatCommunitySectionModule.channelsModel
+    onFooChanged: {
+        console.log("\n\n >>> COMMUNITY ID: ", root.getMySectionId())
+        console.log("\n\n >>> CHANNELS MODEL CHANGED: ", foo.count)
+    }
+    property var channelsModel: SortFilterProxyModel {
+        sourceModel: chatCommunitySectionModule.channelsModel
+
+        // proxyRoles: ExpressionRole {
+        //     function tokenIcon(symbol) {
+        //         return Constants.tokenIcon(symbol)
+        //     }
+        //     name: "iconSource"
+        //     expression: !!model.icon ? model.icon : tokenIcon(model.symbol)
+        // }
+    }
+
     readonly property bool isUserAllowedToSendMessage: _d.isUserAllowedToSendMessage
     readonly property string chatInputPlaceHolderText: _d.chatInputPlaceHolderText
     readonly property var oneToOneChatContact: _d.oneToOneChatContact

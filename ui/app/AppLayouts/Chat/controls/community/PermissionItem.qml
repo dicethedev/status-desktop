@@ -147,6 +147,11 @@ Control{
             Repeater {
                 model: root.channelsListModel
 
+
+                Component.onCompleted: {
+                    console.log("CHANNELS LIST MODEL: ", root.channelsListModel)
+                }
+
                 StatusListItemTag {
                     readonly property bool isLetterIdenticon: !model.imageSource
 

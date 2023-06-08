@@ -9,6 +9,8 @@ import ../../shared_models/user_item as user_item
 import ../../shared_models/user_model as user_model
 import ../../shared_models/token_permissions_model
 import ../../shared_models/token_permission_item
+import ../../shared_models/token_permission_channel_item
+import ../../shared_models/token_permission_channels_model
 import ../../shared_models/token_criteria_item
 import ../../shared_models/token_criteria_model
 import ../../shared_models/token_list_item
@@ -70,6 +72,8 @@ proc buildChatSectionUI(self: Module,
   messageService: message_service.Service,
   gifService: gif_service.Service,
   mailserversService: mailservers_service.Service)
+
+proc buildTokenPermissionChannels(self: Module, channelGroup: ChannelGroupDto)
 
 proc addOrUpdateChat(self: Module,
     chat: ChatDto,
@@ -310,8 +314,40 @@ proc rebuildCommunityTokenPermissionsModel(self: Module) =
   self.view.setAllTokenRequirementsMet(tokenRequirementsMet)
   self.view.setRequiresTokenPermissionToJoin(requiresPermissionToJoin)
 
-proc initCommunityTokenPermissionsModel(self: Module) =
+proc initCommunityTokenPermissionsModel(self: Module, channelGroup: ChannelGroupDto) =
   self.rebuildCommunityTokenPermissionsModel()
+  self.buildTokenPermissionChannels(channelGroup)
+
+proc buildTokenPermissionChannels(self: Module, channelGroup: ChannelGroupDto) =
+  var permissionChannelItems: seq[TokenPermissionChannelItem]
+  # for categoryDto in channelGroup.categories:
+  #   permissionChannelItems.add(initTokenPermissionChannelItem(
+  #     categoryDto.id,
+  #     categoryDto.name,
+  #     true,
+  #     categoryDto.categoryId,
+  #     categoryDto.emoji,
+  #     categoryDto.color,
+  #     categoryDto.icon,
+  #     0
+  #   ))
+
+  for chatDto in channelGroup.chats:
+    permissionChannelItems.add(initTokenPermissionChannelItem(
+      chatDto.id,
+      chatDto.name,
+      false,
+      chatDto.categoryId,
+      chatDto.emoji,
+      chatDto.color,
+      chatDto.icon,
+      0
+    ))
+
+  echo "COMMUNITY ID: ", self.controller.getMySectionId()
+  echo "SETTING ITEMS: ", $permissionChannelItems
+  self.view.setTokenPermissionChannelsItems(permissionChannelItems)
+
 
 proc buildTokenList(self: Module) =
   var tokenListItems: seq[TokenListItem]
@@ -343,7 +379,10 @@ proc buildTokenList(self: Module) =
     )
     collectiblesListItems.add(tokenListItem)
 
+  echo "COMMUNITY ID: ", self.controller.getMySectionId()
+  echo "SETTING TOKEN LIST ITEMS"
   self.view.setTokenListItems(tokenListItems)
+  echo "SETTING COLLECTIBLES LIST ITEMS"
   self.view.setCollectiblesListItems(collectiblesListItems)
 
 method onWalletAccountTokensRebuilt*(self: Module) =
@@ -407,7 +446,7 @@ method onChatsLoaded*(
     self.usersModule.load()
     let community = self.controller.getMyCommunity()
     self.view.setAmIMember(community.joined)
-    self.initCommunityTokenPermissionsModel()
+    self.initCommunityTokenPermissionsModel(channelGroup)
 
   let activeChatId = self.controller.getActiveChatId()
   let isCurrentSectionActive = self.controller.getIsCurrentSectionActive()
@@ -1332,7 +1371,7 @@ proc buildTokenPermissionItem*(self: Module, tokenPermission: CommunityTokenPerm
 
   var tokenPermissionChatListItems: seq[TokenPermissionChatListItem] = @[]
   for chatID in tokenPermission.chatIDs:
-    tokenPermissionChatListItems.add(initTokenPermissionChatListItem(chatID, ""))
+    tokenPermissionChatListItems.add(initTokenPermissionChatListItem(chatID))
 
   let tokenPermissionItem = initTokenPermissionItem(
       tokenPermission.id, 

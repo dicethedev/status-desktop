@@ -1750,6 +1750,9 @@ QtObject:
           if editing:
             signal = SIGNAL_COMMUNITY_TOKEN_PERMISSION_UPDATED
 
+
+          echo "TOKEN PERMISSION CREATED: ", $p
+
           self.events.emit(signal, CommunityTokenPermissionArgs(communityId: communityId, tokenPermission: p))
         return
 

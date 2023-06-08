@@ -32,13 +32,14 @@ QtObject:
       ModelRole.Key.int:"key",
       ModelRole.Type.int:"permissionType",
       ModelRole.TokenCriteria.int:"holdingsListModel",
-      ModelRole.ChatList.int:"channelsModel",
+      ModelRole.ChatList.int:"channelsListModel",
       ModelRole.IsPrivate.int:"isPrivate",
     }.toTable
 
   proc countChanged(self: TokenPermissionsModel) {.signal.}
   proc getCount*(self: TokenPermissionsModel): int {.slot.} =
     self.items.len
+
   QtProperty[int] count:
     read = getCount
     notify = countChanged

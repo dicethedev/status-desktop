@@ -248,7 +248,7 @@ StatusSectionLayout {
 
                 assetsModel: rootStore.assetsModel
                 collectiblesModel: rootStore.collectiblesModel
-                channelsModel: rootStore.chatCommunitySectionModule.model
+                channelsModel: rootStore.channelsModel
 
                 communityDetails: QtObject {
                     readonly property string name: root.community.name

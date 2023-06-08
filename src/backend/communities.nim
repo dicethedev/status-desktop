@@ -168,20 +168,22 @@ proc requestImportDiscordCommunity*(
       "filesToImport": filesToImport
     }])
 
-proc createCommunityTokenPermission*(communityId: string, permissionType: int, tokenCriteria: string, isPrivate: bool): RpcResponse[JsonNode] {.raises: [Exception].} =
+proc createCommunityTokenPermission*(communityId: string, permissionType: int, tokenCriteria: string, chatIDs: seq[string], isPrivate: bool): RpcResponse[JsonNode] {.raises: [Exception].} =
   result = callPrivateRPC("createCommunityTokenPermission".prefix, %*[{
     "communityId": communityId,
     "type": permissionType,
     "tokenCriteria": parseJson(tokenCriteria),
+    "chatIDs": chatIDs,
     "isPrivate": isPrivate
   }])
 
-proc editCommunityTokenPermission*(communityId: string, permissionId: string, permissionType: int, tokenCriteria: string, isPrivate: bool): RpcResponse[JsonNode] {.raises: [Exception].} =
+proc editCommunityTokenPermission*(communityId: string, permissionId: string, permissionType: int, tokenCriteria: string, chatIDs: seq[string], isPrivate: bool): RpcResponse[JsonNode] {.raises: [Exception].} =
   result = callPrivateRPC("editCommunityTokenPermission".prefix, %*[{
     "communityId": communityId,
     "permissionId": permissionId,
     "type": permissionType,
     "tokenCriteria": parseJson(tokenCriteria),
+    "chatIDs": chatIDs,
     "isPrivate": isPrivate
   }])
 

@@ -114,18 +114,12 @@ StatusDropdown {
 
         // TODO: Channel-level permissions are temporarily hidden until they are
         // supported by the backend. Uncomment when backend functionality is ready.
-        /*
+        
         CustomSeparator {
             Layout.fillWidth: true
             Layout.preferredHeight: d.sectionHeight
 
             text: qsTr("Channels")
-        }
-
-        CustomPermissionListItem {
-            permissionType: PermissionTypes.Type.Moderator
-
-            Layout.fillWidth: true
         }
 
         CustomPermissionListItem {
@@ -139,7 +133,6 @@ StatusDropdown {
 
             Layout.fillWidth: true
         }
-        */
 
         Separator {
             visible: !!group.checkedButton

@@ -13,6 +13,8 @@ import ../../shared_models/token_criteria_item
 import ../../shared_models/token_criteria_model
 import ../../shared_models/token_list_item
 import ../../shared_models/token_list_model
+import ../../shared_models/token_permission_chat_list_item
+import ../../shared_models/token_permission_chat_list_model
 
 import chat_content/module as chat_content_module
 import chat_content/users/module as users_module
@@ -1255,13 +1257,16 @@ method joinSpectatedCommunity*(self: Module) =
   if self.usersModule != nil:
     self.usersModule.updateMembersList()
 
-method createOrEditCommunityTokenPermission*(self: Module, communityId: string, permissionId: string, permissionType: int, tokenCriteriaJson: string, isPrivate: bool) =
+method createOrEditCommunityTokenPermission*(self: Module, communityId: string, permissionId: string, permissionType: int, tokenCriteriaJson: string, channelIDs: seq[string], isPrivate: bool) =
+
   var tokenPermission = CommunityTokenPermissionDto()
   tokenPermission.id = permissionId
   tokenPermission.isPrivate = isPrivate
   tokenPermission.`type` = TokenPermissionType(permissionType)
+  tokenPermission.chatIDs = channelIDs
 
   let tokenCriteriaJsonObj = tokenCriteriaJson.parseJson
+
   for tokenCriteria in tokenCriteriaJsonObj:
 
     let viewAmount = tokenCriteria{"amount"}.getFloat
@@ -1324,11 +1329,16 @@ proc buildTokenPermissionItem*(self: Module, tokenPermission: CommunityTokenPerm
 
     tokenCriteriaItems.add(tokenCriteriaItem)
 
+
+  var tokenPermissionChatListItems: seq[TokenPermissionChatListItem] = @[]
+  for chatID in tokenPermission.chatIDs:
+    tokenPermissionChatListItems.add(initTokenPermissionChatListItem(chatID, ""))
+
   let tokenPermissionItem = initTokenPermissionItem(
       tokenPermission.id, 
       tokenPermission.`type`.int, 
       tokenCriteriaItems,
-      @[], # TODO: handle chat list items
+      tokenPermissionChatListItems,
       tokenPermission.isPrivate,
       allTokenCriteriaMet
   )

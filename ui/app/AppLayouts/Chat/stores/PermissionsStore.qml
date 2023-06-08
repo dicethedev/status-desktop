@@ -33,6 +33,7 @@ QtObject {
                         root.activeSectionId, key,
                         permissionType,
                         JSON.stringify(holdings),
+                        channels.map(c => c.key).join(","),
                         isPrivate)
         }
     }

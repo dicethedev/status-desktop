@@ -346,7 +346,7 @@ method switchToChannel*(self: AccessInterface, channelName: string) {.base.} =
 method joinSpectatedCommunity*(self: AccessInterface) {.base.} =
   raise newException(ValueError, "No implementation available")
 
-method createOrEditCommunityTokenPermission*(self: AccessInterface, communityId: string, permissionId: string, permissionType: int, tokenCriteriaJson: string, isPrivate: bool) {.base.} =
+method createOrEditCommunityTokenPermission*(self: AccessInterface, communityId: string, permissionId: string, permissionType: int, tokenCriteriaJson: string, channelIDs: seq[string], isPrivate: bool) {.base.} =
   raise newException(ValueError, "No implementation available")
 
 method deleteCommunityTokenPermission*(self: AccessInterface, communityId: string, permissionId: string) {.base.} =

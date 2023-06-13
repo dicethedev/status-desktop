@@ -28,7 +28,7 @@ mainWindow_Create_password_StatusButton = {"checkable": False, "container": main
 
 # Confirm Password View
 mainWindow_ConfirmPasswordView = {"container": statusDesktop_mainWindow, "type": "ConfirmPasswordView", "unnamed": 1,"visible": True}
-mainWindow_confirmAgainPasswordInput = {"container": mainWindow_ConfirmPasswordView, "echoMode": 2, "objectName": "confirmAgainPasswordInput", "passwordCharacter": "•", "type": "StatusPasswordInput", "visible": True}
+mainWindow_confirmAgainPasswordInput = {"container": mainWindow_ConfirmPasswordView, "objectName": "confirmAgainPasswordInput", "type": "StatusPasswordInput", "visible": True}
 mainWindow_Finalise_Status_Password_Creation_StatusButton = {"checkable": False, "container": mainWindow_ConfirmPasswordView, "objectName": "confirmPswSubmitBtn", "type": "StatusButton", "visible": True}
 
 # Login View

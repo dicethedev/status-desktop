@@ -1,43 +1,44 @@
 import typing
 
-from driver import settings, local_system, remote_system
+import configs
+import driver.settings
+from configs.path import SQUISH_DIR
+from driver.system_path import SystemPath
 
 _PROCESS_NAME = '_squishserver'
 
 
-def start():
-    local_system.execute([settings.SERVER, '--configfile', settings.SERVER_CONFIG, '--verbose', '&'])
-    local_system.wait_for_started(_PROCESS_NAME, 3)
+class SquishServer:
 
+    def __init__(
+            self,
+            squish_dir: SystemPath = SQUISH_DIR,
+            host: str = '127.0.0.1',
+            port: int = driver.settings.SERVER_PORT
+    ):
+        self.path = squish_dir / 'bin' / 'squishserver'
+        self.config = configs.path.VM_TMP / 'squish_server.ini'
+        self.host = host
+        self.port = port
 
-def stop():
-    local_system.kill_process_by_name(_PROCESS_NAME)
+    def get_start_cmd(self):
+        return [str(self.path), '--configfile', str(self.config), f'--port={self.port}']
 
+    def get_stop_cmd(self):
+        return ['killall', _PROCESS_NAME]
 
-def prepare_config():
-    if settings.SERVER_CONFIG.exists():
-        settings.SERVER_CONFIG.unlink()
-    set_cursor_animation(settings.CURSOR_ANIMATION)
-    set_aut_timeout(settings.PROCESS_TIMEOUT_SEC)
+    # https://doc-snapshots.qt.io/squish/cli-squishserver.html
+    def configuring(self, action: str, options: typing.Union[int, str, list]):
+        return [str(self.path), '--configfile', str(self.config), '--config', action, ' '.join(options)]
 
+    def get_cursor_setup_cmd(self, value):
+        return self.configuring('setCursorAnimation', value)
 
-# https://doc-snapshots.qt.io/squish/cli-squishserver.html
-def configuring(action: str, options: typing.Union[int, str, list]):
-    command = [settings.SERVER, '--configfile', str(settings.SERVER_CONFIG), '--config', action, options]
-    remote_system.execute(command)
+    def get_executable_aut_setup_cmd(self, aut_id, app_dir):
+        return self.configuring('addAUT', [aut_id, f'"{app_dir}"'])
 
+    def get_attachable_aut_setup_cmd(self, aut_id: str, port: int):
+        return self.configuring('addAttachableAUT', [aut_id, f'localhost: {port}'])
 
-def set_cursor_animation(value):
-    configuring('setCursorAnimation', value)
-
-
-def add_executable_aut(aut_id, app_dir):
-    configuring('addAUT', [aut_id, app_dir])
-
-
-def add_attachable_aut(aut_id: str, port: int):
-    configuring('addAttachableAUT', [aut_id, f'localhost: {port}'])
-
-
-def set_aut_timeout(value):
-    configuring('setAUTTimeout', value)
+    def get_aut_timeout_setup_cmd(self, value):
+        return self.configuring('setAUTTimeout', [str(value)])

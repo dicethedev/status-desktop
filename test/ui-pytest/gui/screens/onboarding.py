@@ -3,7 +3,7 @@ from abc import abstractmethod
 
 import constants
 import driver
-from constants import UserAccount
+from constants.user import UserAccount
 from driver import settings
 from gui.components.splash_screen import SplashScreen
 from gui.elements.base_element import BaseElement
@@ -30,7 +30,7 @@ class WelcomeScreen(BaseElement):
         self._new_user_button = Button('mainWindow_I_am_new_to_Status_StatusBaseText')
         self._existing_user_button = Button('mainWindow_I_already_use_Status_StatusBaseText')
 
-    def sign_up(self, user_account: UserAccount = constants.user_account):
+    def sign_up(self, user_account: UserAccount = constants.user.user_account_one):
         self.get_keys() \
             .generate_new_keys() \
             .set_display_name(user_account.name) \
@@ -50,7 +50,7 @@ class WelcomeScreen(BaseElement):
         self._existing_user_button.click()
         # TODO: return next view
 
-    def log_in(self, account: UserAccount = constants.user_account):
+    def log_in(self, account: UserAccount = constants.user.user_account_one):
         LoginView().log_in(account)
 
 

@@ -1,41 +1,50 @@
 import logging
-import time
-import typing
-from collections import namedtuple
 from datetime import datetime
 
 import pytest
 
 import configs
 import constants
-from constants import UserAccount
-from driver import system_path, local_system, settings, context
+import driver
+from configs.path import VM_TMP, AUT, VM_SQUISH_DIR, VM_QT_DIR, SQUISH_DIR, QT_DIR, VM_AUT, VM_STATUS_DESKTOP, \
+    VM_WORKPLACE
+from constants.user import UserAccount
+from driver import system_path, local_system, settings
 from driver.aut import ApplicationLauncher
-from gui.components.before_started_popup import BeforeStartedPopUp
+from driver.worker import VirtualMachine
 from gui.components.splash_screen import SplashScreen
 from gui.main_window import MainWindow
-from gui.screens.onboarding import AllowNotificationsView, LoginView
+from gui.screens.onboarding import LoginView
 
 _logger = logging.getLogger(__name__)
 
 
-@pytest.fixture
-def aut() -> ApplicationLauncher:
-    if not configs.path.AUT.exists():
-        pytest.exit(f"Application not found: {configs.path.AUT}")
-    _aut = ApplicationLauncher(configs.path.AUT)
+@pytest.fixture()
+def aut(linux_vm: VirtualMachine) -> ApplicationLauncher:
+    linux_vm.mont_shared_folder(VM_STATUS_DESKTOP.name, VM_STATUS_DESKTOP)
+    linux_vm.mont_shared_folder(SQUISH_DIR.name, VM_SQUISH_DIR)
+    linux_vm.mont_shared_folder(QT_DIR.name, VM_QT_DIR)
+    linux_vm.start_squish_server()
+
+    if not AUT.exists():
+        pytest.exit(f"Application not found: {AUT}")
+    _aut = ApplicationLauncher(VM_AUT, linux_vm.server.host, linux_vm.aut_port)
+
+    linux_vm.setup_squish_config(_aut.path)
+    # linux_vm.set_environment_variables()
+    driver.testSettings.setWrappersForApplication(_aut.path.stem, [settings.AUT_WRAPPER])
+
     yield _aut
-    _aut.detach().stop()
 
 
 @pytest.fixture
 def app_data() -> system_path.SystemPath:
-    yield configs.path.STATUS_DATA / f'app_{datetime.now():%H%M%S_%f}'
+    yield configs.path.VM_STATUS_DATA / f'app_{datetime.now():%H%M%S_%f}'
 
 
 @pytest.fixture
 def user_data(request) -> system_path.SystemPath:
-    user_data = configs.path.STATUS_DATA / f'app_{datetime.now():%H%M%S_%f}' / 'data'
+    user_data = configs.path.VM_STATUS_DATA / f'app_{datetime.now():%H%M%S_%f}' / 'data'
     if hasattr(request, 'param'):
         system_path.SystemPath(request.param).copy_to(user_data)
     yield user_data
@@ -43,7 +52,7 @@ def user_data(request) -> system_path.SystemPath:
 
 @pytest.fixture
 def user_data_two(request, user_data) -> system_path.SystemPath:
-    user_data = configs.path.STATUS_DATA / f'app_{datetime.now():%H%M%S_%f}' / 'data'
+    user_data = configs.path.VM_STATUS_DATA / f'app_{datetime.now():%H%M%S_%f}' / 'data'
     if hasattr(request, 'param'):
         system_path.SystemPath(request.param).copy_to(user_data)
     yield user_data
@@ -53,6 +62,7 @@ def user_data_two(request, user_data) -> system_path.SystemPath:
 def main_window(aut: ApplicationLauncher, user_data: system_path.SystemPath) -> MainWindow:
     aut.launch(f'-d={user_data.parent}')
     yield MainWindow().wait_until_appears().prepare()
+    aut.detach().stop()
 
 
 @pytest.fixture
@@ -61,7 +71,7 @@ def user_account(request) -> UserAccount:
         user_account = request.param
         assert isinstance(user_account, UserAccount)
     else:
-        user_account = constants.user.user_account
+        user_account = constants.user.user_account_one
     yield user_account
 
 

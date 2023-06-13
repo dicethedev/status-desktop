@@ -2,6 +2,7 @@ import logging
 import os
 import pathlib
 import shutil
+import time
 
 _logger = logging.getLogger(__name__)
 
@@ -30,6 +31,15 @@ class SystemPath(pathlib.Path):
             if not ignore_errors:
                 raise
 
-    def copy_to(self, destination: 'SystemPath'):
+    def copy_to(self, destination: 'SystemPath', chunk_size: int):
         _logger.info(f'Copy from {self} to {destination}')
-        shutil.copytree(self, destination, dirs_exist_ok=True)
+        if self.is_file():
+            with self.open('rb') as source_file:
+                with destination.open('wb') as destination_path:
+                    while True:
+                        chunk = source_file.read(chunk_size)
+                        if not chunk:
+                            break
+                        destination_path.write(chunk)
+        else:
+            shutil.copytree(self, destination, dirs_exist_ok=True)

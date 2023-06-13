@@ -12,6 +12,7 @@ pytest_plugins = [
     'tests.fixtures.aut',
     'tests.fixtures.path',
     'tests.fixtures.squish',
+    'tests.fixtures.vms',
 ]
 
 
@@ -19,15 +20,16 @@ pytest_plugins = [
 def setup_session_scope(
         terminate_old_processes,
         run_dir,  # adds test directories, clears temp data, and fills configs
+        vms
 ):
     _logger.info('Setup session: Done')
 
 
-@pytest.fixture(scope='function', autouse=True)
-def setup_test_scope(
-        server,  # prepares driver server config, starts/stops driver server
-):
-    _logger.info('Setup test: Done')
+# @pytest.fixture(scope='function', autouse=True)
+# def setup_test_scope(
+#         server,  # prepares driver server config, starts/stops driver server
+# ):
+#     _logger.info('Setup test: Done')
 
 
 def pytest_exception_interact(node):

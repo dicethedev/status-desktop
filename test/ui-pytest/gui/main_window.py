@@ -1,7 +1,7 @@
 import logging
 
 import driver
-from constants import UserAccount
+from constants.user import UserAccount
 from driver import settings
 from gui.components.before_started_popup import BeforeStartedPopUp
 from gui.components.splash_screen import SplashScreen

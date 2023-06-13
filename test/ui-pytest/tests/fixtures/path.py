@@ -35,7 +35,7 @@ def generate_test_info(node):
 @pytest.fixture(scope='session')
 def run_dir():
     _logger.info('Setup session: Directories')
-    keep_results = 5
+    keep_results = 10
     run_name_pattern = 'run_????????_??????'
     runs = list(sorted(configs.path.RESULTS.glob(run_name_pattern)))
     if len(runs) > keep_results:

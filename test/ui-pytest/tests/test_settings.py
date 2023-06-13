@@ -11,7 +11,7 @@ from gui.screens.settings import SettingsScreen
 
 # Test Case: https://ethstatus.testrail.net/index.php?/cases/view/702389
 @pytest.mark.case(702389)
-def test_backup_seed_phrase(main_screen):
+def test_backup_seed_phrase(linux_vm, main_screen):
     assert main_screen.is_secure_phrase_banner_visible()
     settings: SettingsScreen = main_screen.navigator.open_settings()
     back_up_seed_phrase_popup = settings.menu_panel.start_back_up_seed_phrase()

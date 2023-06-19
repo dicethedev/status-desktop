@@ -11,7 +11,7 @@ from gui.screens.settings import SettingsScreen
 
 # Test Case: https://ethstatus.testrail.net/index.php?/cases/view/702389
 @pytest.mark.case(702389)
-def test_backup_seed_phrase(linux_vm, main_screen):
+def test_backup_seed_phrase(main_screen):
     assert main_screen.is_secure_phrase_banner_visible()
     settings: SettingsScreen = main_screen.navigator.open_settings()
     back_up_seed_phrase_popup = settings.menu_panel.start_back_up_seed_phrase()
@@ -35,7 +35,7 @@ def test_backup_seed_phrase(linux_vm, main_screen):
 # Test Case: https://ethstatus.testrail.net/index.php?/cases/view/703011
 @pytest.mark.case(703011)
 @pytest.mark.parametrize('chat_key, who_you_are', [
-    pytest.param('zQ3shQihZMmciZWUrjvsY6kUoaqSKp9DFSjMPRkkKGty3XCKZ', 'I am a fellow tester', id='new_contact')
+    pytest.param('zQ3shQihZMmciZWUrjvsY6kUoaqSKTruep9DFSjMPRkkKGty3XCKZ', 'I am a fellow tester', id='new_contact')
 ])
 def test_add_contact_with_chat_key(main_screen, chat_key, who_you_are):
     settings = main_screen.navigator.open_settings()

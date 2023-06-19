@@ -1,2 +1,3 @@
 
 WORKERS_LIMIT = 4
+LOCAL_RUN = False

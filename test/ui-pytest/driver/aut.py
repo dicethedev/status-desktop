@@ -15,16 +15,21 @@ class ApplicationLauncher:
     def __str__(self):
         return type(self).__qualname__
 
-    def attach(self, timeout_sec: int = settings.PROCESS_TIMEOUT_SEC):
+    def attach(self, timeout_sec: int = settings.PROCESS_TIMEOUT_SEC, attempt: int = 2):
         if self.ctx is None:
             self.ctx = context.attach(self.path.stem, timeout_sec)
-        squish.setApplicationContext(self.ctx)
-        return self
+        try:
+            squish.setApplicationContext(self.ctx)
+        except TypeError as err:
+            if attempt:
+                return self.attach(timeout_sec, attempt - 1)
+            else:
+                raise err
 
     def detach(self):
         if self.ctx is not None:
             squish.currentApplicationContext().detach()
-            assert squish.waitFor(lambda: not self.ctx.isRunning, settings.APP_LOAD_TIMEOUT_MSEC)
+            assert squish.waitFor(lambda: not self.ctx.isRunning, settings.PROCESS_TIMEOUT_SEC)
         self.ctx = None
         return self
 
@@ -52,7 +57,7 @@ class ApplicationLauncher:
         # else:
         command = [self.path.stem] + list(args)
 
-        self.ctx = squish.startApplication(' '.join(command), self.host, self.port, settings.APP_LOAD_TIMEOUT_MSEC)
+        self.ctx = squish.startApplication(' '.join(command), self.host, self.port, settings.PROCESS_TIMEOUT_SEC)
         self.attach()
-        assert squish.waitFor(lambda: self.ctx.isRunning, settings.APP_LOAD_TIMEOUT_MSEC)
+        assert squish.waitFor(lambda: self.ctx.isRunning, settings.PROCESS_TIMEOUT_SEC)
         return self

@@ -1,6 +1,7 @@
 import pytest
 
 import driver
+from configs.path import AUT, VM_AUT
 from driver import settings
 from driver.aut import ApplicationLauncher
 import configs
@@ -9,7 +10,7 @@ from driver.system_path import SystemPath
 from gui.components.splash_screen import SplashScreen
 from gui.main_window import MainWindow
 
-@pytest.mark.skip
+
 # Test Case: https://ethstatus.testrail.net/index.php?/cases/view/703011
 @pytest.mark.case(703011)
 @pytest.mark.parametrize('user_data, user_data_two, message', [
@@ -19,13 +20,13 @@ from gui.main_window import MainWindow
         'Test message',
         id='chat')
 ], indirect=['user_data', 'user_data_two'])
-def test_one_to_one_chat(user_data: SystemPath, user_data_two: SystemPath, message):
-    aut_one = ApplicationLauncher(configs.path.AUT).launch(f'-d={user_data.parent}')
+def test_one_to_one_chat(worker, user_data: SystemPath, user_data_two: SystemPath, message):
+    aut_one = ApplicationLauncher(worker.aut_path, worker.server.host, worker.aut_port).launch(f'-d={user_data.parent}')
     main_window_one = MainWindow().wait_until_appears().prepare()
     main_window_one.log_in_user(constants.user.user_account_one)
     SplashScreen().wait_until_appears().wait_until_hidden(settings.APP_LOAD_TIMEOUT_MSEC)
 
-    aut_two = ApplicationLauncher(configs.path.AUT).launch(f'-d={user_data_two.parent}')
+    aut_two = ApplicationLauncher(worker.aut_path, worker.server.host, worker.aut_port).launch(f'-d={user_data_two.parent}')
     main_window_two = MainWindow().wait_until_appears().prepare()
     main_window_two.log_in_user(constants.user.user_account_two)
     SplashScreen().wait_until_appears().wait_until_hidden(settings.APP_LOAD_TIMEOUT_MSEC)

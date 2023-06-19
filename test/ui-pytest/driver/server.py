@@ -2,7 +2,7 @@ import typing
 
 import configs
 import driver.settings
-from configs.path import SQUISH_DIR
+from configs.path import SQUISH_DIR, SQUISH_CFG
 from driver.system_path import SystemPath
 
 _PROCESS_NAME = '_squishserver'
@@ -17,7 +17,7 @@ class SquishServer:
             port: int = driver.settings.SERVER_PORT
     ):
         self.path = squish_dir / 'bin' / 'squishserver'
-        self.config = configs.path.VM_TMP / 'squish_server.ini'
+        self.config = SQUISH_CFG
         self.host = host
         self.port = port
 

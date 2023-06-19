@@ -1,5 +1,7 @@
 import logging
+import os
 import time
+from abc import abstractmethod
 
 import paramiko
 import remotesystem
@@ -28,9 +30,26 @@ class BaseWorker:
         self.install_dir = install_dir
         self.host = host
         self.port = port
+        self.aut_port = port
+        self.aut_path = None
 
-    def upload(self, local_source: SystemPath, destination: SystemPath):
-        assert self.system.copy(str(local_source), str(destination))
+    @abstractmethod
+    def execute(self, command, timeout_sec=10):
+        raise NotImplementedError
+
+    @abstractmethod
+    def start_squish_server(self):
+        raise NotImplementedError
+
+    def stop_squish_server(self):
+        self.execute(self.server.get_stop_cmd())
+
+    def setup_squish_config(self, aut_path: SystemPath, timeout_sec=10):
+        self.execute(['mkdir', '-p', self.server.config.parent])
+        self.execute(['cat', '>', self.server.config], timeout_sec=2)
+        self.execute(self.server.get_executable_aut_setup_cmd(aut_path.stem, aut_path.parent), timeout_sec=timeout_sec)
+        time.sleep(2)
+        self.execute(self.server.get_aut_timeout_setup_cmd(60), timeout_sec=timeout_sec)
 
 
 class VirtualMachine(BaseWorker):
@@ -45,6 +64,7 @@ class VirtualMachine(BaseWorker):
         super(VirtualMachine, self).__init__(install_dir)
         self.name = name
         self.aut_port = aut_port
+        self.aut_path = configs.path.VM_AUT
         self.ssh_port = ssh_port
         self.path = configs.path.VMS / self.name
         self.disk = self.path / f'{self.name}.vdi'
@@ -78,26 +98,46 @@ class VirtualMachine(BaseWorker):
             return exit_status
 
     def start_squish_server(self):
-        self.execute(['mkdir', '-p', self.server.config.parent])
-        self.execute(['cat', '>', self.server.config], timeout_sec=2)
         # self.execute(self.server.get_stop_cmd(), sudo=True)
         # self.execute(self.server.get_start_cmd(), timeout_sec=0)
         pass
 
-    def setup_squish_config(self, aut_path: SystemPath):
-        self.execute(self.server.get_executable_aut_setup_cmd(aut_path.stem, aut_path.parent))
-        self.execute(self.server.get_aut_timeout_setup_cmd(60))
-
-    def upload_file(self, local_file: SystemPath, vm_file_path: SystemPath, executable: bool = False):
+    def upload_file(self, local_file: SystemPath, vm_dir: SystemPath, executable: bool = False):
         ftp_client = self.get_ssh_client().open_sftp()
         try:
-            ftp_client.remove(str(vm_file_path / local_file.stem))
+            ftp_client.remove(str(vm_dir / local_file.stem))
         except FileNotFoundError:
             pass
-        ftp_client.put(str(local_file), str(vm_file_path / local_file.stem))
+        ftp_client.put(str(local_file), str(vm_dir / local_file.stem))
         if executable:
-            ftp_client.chmod(str(vm_file_path / local_file.stem), 111)
+            ftp_client.chmod(str(vm_dir / local_file.stem), 111)
         ftp_client.close()
+
+    def upload_folder(self, local_dir: SystemPath, vm_dir: SystemPath):
+        ftp_client = self.get_ssh_client().open_sftp()
+
+        def put_dir(source, target):
+            for item in os.listdir(source):
+                if os.path.isfile(os.path.join(source, item)):
+                    ftp_client.put(os.path.join(source, item), '%s/%s' % (target, item))
+                else:
+                    mkdir('%s/%s' % (target, item), ignore_existing=True)
+                    put_dir(os.path.join(source, item), '%s/%s' % (target, item))
+
+        def mkdir(path, mode=511, ignore_existing=False):
+            try:
+                ftp_client.mkdir(path, mode)
+            except IOError:
+                if ignore_existing:
+                    pass
+                else:
+                    raise
+
+        mkdir(str(vm_dir.parent))
+        mkdir(str(vm_dir))
+        local_dir = str(local_dir)
+        vm_dir = str(vm_dir)
+        put_dir(local_dir, vm_dir)
 
     def mont_shared_folder(self, name, path):
         self.execute(['mkdir', path], sudo=True)
@@ -113,13 +153,12 @@ class LocalMachine(BaseWorker):
 
     def __init__(self):
         super(LocalMachine, self).__init__()
+        self.aut_path = configs.path.AUT
 
-    def execute(self, command):
+    def execute(self, command, timeout_sec=0):
         _logger.info(f'Remote Execute: {" ".join(str(atr) for atr in command)}')
-        exitcode, stdout, stderr = self.system.execute(command)
-        if exitcode != '0':
-            raise RuntimeError(f'exitcode: {exitcode}, stdout: {stdout}, stderr: {stderr}')
+        local_system.execute(command)
 
     def start_squish_server(self):
-        local_system.execute(self.server.get_stop_cmd())
-        local_system.execute(self.server.get_start_cmd())
+        self.execute(self.server.get_start_cmd())
+        local_system.wait_for_started('_squishserver')

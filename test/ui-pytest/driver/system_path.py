@@ -31,7 +31,7 @@ class SystemPath(pathlib.Path):
             if not ignore_errors:
                 raise
 
-    def copy_to(self, destination: 'SystemPath', chunk_size: int):
+    def copy_to(self, destination: 'SystemPath', chunk_size: int = 1**10):
         _logger.info(f'Copy from {self} to {destination}')
         if self.is_file():
             with self.open('rb') as source_file:

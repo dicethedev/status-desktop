@@ -2,6 +2,7 @@ import os
 import typing
 from datetime import datetime
 
+from configs.local import LOCAL_RUN
 from driver.system_path import SystemPath
 
 # Runtime initialisation
@@ -25,7 +26,6 @@ UI_IMG: SystemPath = VP / 'ui_img'
 
 # Application Directories
 AUT: SystemPath = SystemPath(os.getenv('AUT_PATH', ROOT.parent.parent / 'bin' / 'nim_status_client'))
-STATUS_DATA: SystemPath = RUN / 'status'
 
 # TODO: move to submodule
 STATUS_USER_COMMUNITY_MEMBERS_DATA: SystemPath = ROOT.parent / 'ui-test' / 'fixtures' / 'community_members'
@@ -44,5 +44,8 @@ VM_SQUISH_DIR = VM_MNT_DIR / 'squish'
 VM_QT_DIR = VM_MNT_DIR / 'qt'
 VM_STATUS_DESKTOP = VM_MNT_DIR / 'status_desktop'
 VM_AUT = VM_STATUS_DESKTOP / 'bin' / AUT.name
+
+STATUS_DATA: SystemPath = RUN / 'status' if LOCAL_RUN else VM_STATUS_DATA
+SQUISH_CFG = TEMP if LOCAL_RUN else VM_TMP / 'squish_server.ini'
 
 

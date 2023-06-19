@@ -41,7 +41,7 @@ def run_dir():
     if len(runs) > keep_results:
         del_runs = runs[:len(runs) - keep_results]
         for run in del_runs:
-            SystemPath(run).rmtree()
+            SystemPath(run).rmtree(ignore_errors=True)
             _logger.info(f"Remove old test run directory: {run.relative_to(configs.path.ROOT)}")
     configs.path.RUN.mkdir(parents=True, exist_ok=True)
     _logger.info(f"Created new test run directory: {configs.path.RUN.relative_to(configs.path.ROOT)}")

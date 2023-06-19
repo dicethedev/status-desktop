@@ -8,7 +8,7 @@ import pytest
 import configs.local
 import constants
 import driver
-from configs.path import VM_SQUISH_DIR, VMS
+from configs.path import VM_SQUISH_DIR, VMS, VM_STATUS_DESKTOP, SQUISH_DIR, QT_DIR, VM_QT_DIR
 from constants.vbox import VMState
 from driver.virtual_box import VirtualBox
 from driver.worker import VirtualMachine
@@ -18,21 +18,22 @@ vm2 = True
 
 
 vms = [True, True]
-vm_names = ['ubuntu22-01', 'ubuntu22-02', 'ubuntu22-03', 'ubuntu22-04']
+vm_names = [f'ubuntu22-0{index}' for index in range(1, configs.local.WORKERS_LIMIT+1)]
 
 _logger = logging.getLogger(__name__)
 
 
 @pytest.fixture(scope='session')
 def vms():
-    vb = VirtualBox()
-    vm_base_name = 'ubuntu22-0'
-    if len(vb.vms) != configs.local.WORKERS_LIMIT:
-        for index in range(1, configs.local.WORKERS_LIMIT+1):
-            if f'{vm_base_name}{index}' in [info.name for info in vb.vms]:
-                continue
-            else:
-                vb.create_vm(f'{vm_base_name}{index}', index)
+    if not configs.local.LOCAL_RUN:
+        vb = VirtualBox()
+        vm_base_name = 'ubuntu22-0'
+        if len(vb.vms) != configs.local.WORKERS_LIMIT:
+            for index in range(1, configs.local.WORKERS_LIMIT+1):
+                if f'{vm_base_name}{index}' in [info.name for info in vb.vms]:
+                    continue
+                else:
+                    vb.create_vm(f'{vm_base_name}{index}', index)
 
 
 @contextmanager
@@ -62,6 +63,11 @@ def linux_vm():
                 aut_port=vb.get_port_forward(vm_name, driver.settings.SERVER_PORT),
                 ssh_port=vb.get_port_forward(vm_name, 22)
             )
+
+            vm.mont_shared_folder(VM_STATUS_DESKTOP.name, VM_STATUS_DESKTOP)
+            vm.mont_shared_folder(SQUISH_DIR.name, VM_SQUISH_DIR)
+            vm.mont_shared_folder(QT_DIR.name, VM_QT_DIR)
+
             vm_state = vb.get_vm_state(vm_name)
             if VMState.PAUSED.value in vm_state:
                 vb.resume_vm(vm_name)

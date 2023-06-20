@@ -12,7 +12,7 @@ from gui.main_window import MainWindow
 
 
 # Test Case: https://ethstatus.testrail.net/index.php?/cases/view/703011
-@pytest.mark.case(703011)
+@pytest.mark.case(703050)
 @pytest.mark.parametrize('user_data, user_data_two, message', [
     pytest.param(
         configs.path.STATUS_USER_MUTUAL_CONTACTS_DATA,

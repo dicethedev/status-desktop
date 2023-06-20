@@ -10,7 +10,7 @@ from gui.screens.settings import SettingsScreen
 
 
 # Test Case: https://ethstatus.testrail.net/index.php?/cases/view/702389
-@pytest.mark.case(702389)
+@pytest.mark.case(703162)
 def test_backup_seed_phrase(main_screen):
     assert main_screen.is_secure_phrase_banner_visible()
     settings: SettingsScreen = main_screen.navigator.open_settings()
@@ -33,7 +33,7 @@ def test_backup_seed_phrase(main_screen):
 
 
 # Test Case: https://ethstatus.testrail.net/index.php?/cases/view/703011
-@pytest.mark.case(703011)
+@pytest.mark.case(703049)
 @pytest.mark.parametrize('chat_key, who_you_are', [
     pytest.param('zQ3shQihZMmciZWUrjvsY6kUoaqSKTruep9DFSjMPRkkKGty3XCKZ', 'I am a fellow tester', id='new_contact')
 ])
@@ -45,7 +45,7 @@ def test_add_contact_with_chat_key(main_screen, chat_key, who_you_are):
 
 
 # Test Case: https://ethstatus.testrail.net/index.php?/cases/view/703009
-@pytest.mark.case(703009)
+@pytest.mark.case(703084)
 # Each language run takes 30 seconds, so only some of them are enabled until we can parallelize executions
 @pytest.mark.parametrize('language, native', [
     # ('English', 'English'),

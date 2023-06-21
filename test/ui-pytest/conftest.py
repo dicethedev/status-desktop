@@ -1,3 +1,13 @@
+import os
+
+print(os.environ.get('LD_LIBRARY_PATH'))
+print(os.environ.get('PYTHONPATH'))
+print(os.environ.get('SQUISH_DIR'))
+
+os.environ["LD_LIBRARY_PATH"] = "/home/squisher/Workspace/Qt/5.15.2/gcc_64/lib:/home/squisher/Workspace/squish/lib:/home/squisher/Workspace/squish/lib/python:/home/squisher/Workspace/squish/python3/lib:/opt/Qt/5.15.2/gcc_64/lib:/home/squisher/Workspace/status-desktop/vendor/DOtherSide/build/qzxing:/home/squisher/Workspace/status-desktop/vendor/status-go/build/bin:/home/squisher/Workspace/status-desktop/vendor/status-keycard-go/build/libkeycard"
+os.environ["PYTHONPATH"] = "/home/squisher/Workspace/squish/lib:/home/squisher/Workspace/squish/lib/python"
+os.environ["SQUISH_DIR"] = "/home/squisher/Workspace/squish"
+
 import logging
 
 import pytest

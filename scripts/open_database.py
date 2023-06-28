@@ -1,5 +1,5 @@
 import sys, os, re
-import sqlcipher3
+import sqlcipher3, json
 from getpass import getpass
 from common import PasswordFunctions
 
@@ -101,6 +101,7 @@ while True:
     if cmd == "exit":
         break
     output = db.execute(cmd).fetchall()
+    # json_output = json.dumps(output)
     print(output)
 
 db.close()

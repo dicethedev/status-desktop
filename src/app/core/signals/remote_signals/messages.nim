@@ -58,6 +58,8 @@ proc fromEvent*(T: type MessageSignal, event: JsonNode): MessageSignal =
   if not event.contains("event"):
     return signal
 
+  echo "<<< MessageSignal: " & $event
+
   let e = event["event"]
 
   if e.contains("contacts"):

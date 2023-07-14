@@ -32,8 +32,7 @@ ColumnLayout {
 
     onVisibleChanged: {
         if (visible && RootStore.isTransactionFilterDirty) {
-            // TODO(#11412) restore filter for selected wallet account
-            d.activityFiltersStore.resetAllFilters()
+            d.currentActivityFiltersStore.applyAllFilters()
         }
     }
 
@@ -45,10 +44,35 @@ ColumnLayout {
         }
     }
 
+    Connections {
+        target: RootStore.walletSectionInst
+        function onWalletAccountRemoved(address) {
+            address = address.toLowerCase();
+            for (var addressKey in d.activityFiltersStoreDictionary){
+                if (address === addressKey.toLowerCase()){
+                    delete d.activityFiltersStoreDictionary[addressKey]
+                    return
+                }
+            }
+        }
+    }
+
     QtObject {
         id: d
         readonly property bool isInitialLoading: RootStore.loadingHistoryTransactions && transactionListRoot.count === 0
-        property var activityFiltersStore: WalletStores.ActivityFiltersStore{}
+        property var activityFiltersStoreDictionary: ({})
+        readonly property var currentActivityFiltersStore: {
+            const address = root.overview.mixedcaseAddress
+            if (address in activityFiltersStoreDictionary) {
+                return activityFiltersStoreDictionary[address]
+            }
+            let store = storeComponent.createObject(root)
+            activityFiltersStoreDictionary[address] = store
+            return store
+        }
+
+        readonly property Component storeComponent: WalletStores.ActivityFiltersStore{}
+
         readonly property int loadingSectionWidth: 56
         readonly property int topSectionMargin: 20
 
@@ -75,16 +99,16 @@ ColumnLayout {
         id: noTxs
         Layout.fillWidth: true
         Layout.preferredHeight: 42
-        visible: !d.isInitialLoading && !d.activityFiltersStore.filtersSet && transactionListRoot.count === 0
+        visible: !d.isInitialLoading && !d.currentActivityFiltersStore.filtersSet && transactionListRoot.count === 0
         font.pixelSize: Style.current.primaryTextFontSize
         text: qsTr("Activity for this account will appear here")
     }
 
     ActivityFilterPanel {
         id: filterComponent
-        visible: d.isInitialLoading || transactionListRoot.count > 0 || d.activityFiltersStore.filtersSet
+        visible: d.isInitialLoading || transactionListRoot.count > 0 || d.currentActivityFiltersStore.filtersSet
         Layout.fillWidth: true
-        activityFilterStore: d.activityFiltersStore
+        activityFilterStore: d.currentActivityFiltersStore
         store: WalletStores.RootStore
         isLoading: d.isInitialLoading
     }

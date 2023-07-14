@@ -113,6 +113,10 @@ QtObject:
   proc emitDestroyAddAccountPopup*(self: View) =
     self.destroyAddAccountPopup()
 
+  proc walletAccountRemoved*(self: View, address: string) {.signal.}
+  proc emitWalletAccountRemoved*(self: View, address: string) =
+    self.walletAccountRemoved(address)
+
   proc getActivityController(self: View): QVariant {.slot.} =
     return newQVariant(self.activityController)
   QtProperty[QVariant] activityController:

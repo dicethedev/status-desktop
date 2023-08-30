@@ -9,6 +9,7 @@ from driver.objects_access import walk_children
 from gui.components.base_popup import BasePopup
 from gui.components.wallet.add_saved_address_popup import AddressPopup, EditSavedAddressPopup
 from gui.components.wallet.confirmation_popup import ConfirmationPopup
+from gui.components.wallet.remove_wallet_account_popup import RemoveWalletAccountPopup
 from gui.components.wallet.wallet_account_popups import AccountPopup
 from gui.components.context_menu import ContextMenu
 from gui.elements.qt.button import Button
@@ -67,7 +68,7 @@ class LeftPanel(QObject):
 
     @close_exists(BasePopup())
     def _open_context_menu(self) -> ContextMenu:
-        super(LeftWalletPanel, self).open_context_menu()
+        super(LeftPanel, self).open_context_menu()
         return ContextMenu().wait_until_appears()
 
     @close_exists(BasePopup())
@@ -86,6 +87,35 @@ class LeftPanel(QObject):
             else:
                 raise
 
+    def open_add_account_popup(self, attempt: int = 2):
+        self._add_account_button.click()
+        try:
+            return AccountPopup().wait_until_appears()
+        except AssertionError as err:
+            if attempt:
+                self.open_add_account_popup(attempt-1)
+            else:
+                raise err
+
+    def open_add_watch_only_account_popup(self, attempt: int = 2) -> AccountPopup:
+        try:
+            self._open_context_menu().select('Add watch-only account')
+            return AccountPopup().wait_until_appears()
+        except:
+            if attempt:
+                return self.open_add_watch_anly_account_popup(attempt - 1)
+            else:
+                raise
+
+    def delete_account(self, account_name: str, attempt: int = 2) -> RemoveWalletAccountPopup:
+        try:
+            self._open_context_menu_for_account(account_name).select('Delete')
+            return RemoveWalletAccountPopup().wait_until_appears()
+        except:
+            if attempt:
+                return self.delete_account(account_name, attempt - 1)
+            else:
+                raise
 
 class SavedAdressesView(QObject):
 

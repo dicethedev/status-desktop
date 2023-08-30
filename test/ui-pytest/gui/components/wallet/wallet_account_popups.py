@@ -49,6 +49,16 @@ class AccountPopup(BasePopup):
         EmojiPopup().wait_until_appears().select(value)
         return self
 
+    def set_eth_address(self, value: str):
+        self._address_text_edit.text = value
+        return self
+
+    def set_origin_eth_address(self, value: str):
+        self._origin_combobox.click()
+        self._watch_only_account_origin_item.click()
+        self._address_text_edit.text = value
+        return self
+
     def save(self):
-        self._add_account_button.click()
+        self._add_account_button.wait_until_appears().click()
         return self

@@ -42,5 +42,25 @@ def test_manage_saved_address(main_screen: MainWindow, name: str, address: str, 
 
     with step('Verify that saved address with new name is not in the list of saved addresses'):
         assert driver.waitFor(
-            lambda: new_name not in wallet.left_panel.open_saved_addresses().address_names,
+            lambda: new_name not in wallet.left_panel.open_saved_addresses().address_names)
+
+    with step('Verify that saved address is in the list of saved addresses'):
+        assert driver.waitFor(
+            lambda: name in wallet.open_saved_addresses().address_names,
+            configs.timeouts.UI_LOAD_TIMEOUT_MSEC), f'Address: {name} not found'
+
+    with step('Edit saved address to new name'):
+        wallet.open_saved_addresses().open_edit_address_popup(name).edit_saved_address(new_name, address)
+
+    with step('Verify that saved address with new name is in the list of saved addresses'):
+        assert driver.waitFor(
+            lambda: new_name in wallet.open_saved_addresses().address_names,
+            configs.timeouts.UI_LOAD_TIMEOUT_MSEC), f'Address: {new_name} not found'
+
+    with step('Delete address with new name'):
+        wallet.open_saved_addresses().delete_saved_address(new_name)
+
+    with step('Verify that saved address with new name is not in the list of saved addresses'):
+        assert driver.waitFor(
+            lambda: new_name not in wallet.open_saved_addresses().address_names,
             configs.timeouts.UI_LOAD_TIMEOUT_MSEC), f'Address: {new_name} not found'

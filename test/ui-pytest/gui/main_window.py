@@ -96,6 +96,7 @@ class LeftPanel(QObject):
         self._wallet_button.click()
         return WalletScreen().wait_until_appears()
 
+
 class MainWindow(Window):
 
     def __init__(self):

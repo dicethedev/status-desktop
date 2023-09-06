@@ -525,23 +525,34 @@ class KeycardSettingsView(BaseElement):
     def check_keycard_screen_loaded(self):
         assert KeycardSettingsView().is_visible
 
-    def check_setup_existing_option(self):
+    def check_all_options_visible(self):
         assert self._setup_keycard_with_existing_account_button.is_visible, f'Setup keycard with existing account not visible'
-
-    def check_create_new_option(self):
         assert self._create_new_keycard_account_button.is_visible, f'Create new keycard button not visible'
-
-    def check_import_restore_option(self):
         assert self._import_restore_via_seed_phrase_button.is_visible, f'Import and restore via seed phrase button not visible'
-
-    def check_import_from_keycard_option(self):
+        ProfileSettingsView()._scroll_view.vertical_scroll_to(self._import_from_keycard_button)
         assert wait_for(self._import_from_keycard_button.is_visible, 10000), f'Import keycard button not visible'
-
-    def check_whats_on_keycard_option(self):
-        assert self._check_whats_on_keycard_button.is_visible, f'Check what on keycard not visible'
-
-    def check_factory_reset_option(self):
+        ProfileSettingsView()._scroll_view.vertical_scroll_to(self._check_whats_on_keycard_button)
+        assert wait_for(self._check_whats_on_keycard_button.is_visible, 10000), f'Check what on keycard not visible'
         ProfileSettingsView()._scroll_view.vertical_scroll_to(self._factory_reset_keycard_button)
-        assert self._factory_reset_keycard_button.is_visible, f'Factory reset button not visible'
+        assert wait_for(self._factory_reset_keycard_button.is_visible, 10000), f'Factory reset button not visible'
+
+    # def check_setup_existing_option(self):
+    #     assert self._setup_keycard_with_existing_account_button.is_visible, f'Setup keycard with existing account not visible'
+    #
+    # def check_create_new_option(self):
+    #     assert self._create_new_keycard_account_button.is_visible, f'Create new keycard button not visible'
+    #
+    # def check_import_restore_option(self):
+    #     assert self._import_restore_via_seed_phrase_button.is_visible, f'Import and restore via seed phrase button not visible'
+    #
+    # def check_import_from_keycard_option(self):
+    #     assert wait_for(self._import_from_keycard_button.is_visible, 10000), f'Import keycard button not visible'
+    #
+    # def check_whats_on_keycard_option(self):
+    #     assert self._check_whats_on_keycard_button.is_visible, f'Check what on keycard not visible'
+    #
+    # def check_factory_reset_option(self):
+    #     ProfileSettingsView()._scroll_view.vertical_scroll_to(self._factory_reset_keycard_button)
+    #     assert self._factory_reset_keycard_button.is_visible, f'Factory reset button not visible'
 
 

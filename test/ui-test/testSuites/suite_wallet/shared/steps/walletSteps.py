@@ -199,12 +199,13 @@ def step(context):
 
 @Then("all buttons of keycard view are displayed")
 def step(context):
-    _keycardView.check_setup_existing_option()
-    _keycardView.check_create_new_option()
-    _keycardView.check_import_restore_option()
-    _keycardView.check_import_from_keycard_option()
-    _keycardView.check_whats_on_keycard_option()
-    _keycardView.check_factory_reset_option()
+    _keycardView.check_all_options_visible()
+    # _keycardView.check_setup_existing_option()
+    # _keycardView.check_create_new_option()
+    # _keycardView.check_import_restore_option()
+    # _keycardView.check_import_from_keycard_option()
+    # _keycardView.check_whats_on_keycard_option()
+    # _keycardView.check_factory_reset_option()
 
 @Then("the account with \"|any|\" is not displayed")
 def step(context, name):

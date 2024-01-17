@@ -17,7 +17,7 @@
   {
       "chainId": 5,
       "chainName": "Goerli",
-      "rpcUrl": "https://goerli.infura.io/v3/%INFURA_TOKEN_RESOLVED%",
+      "rpcUrl": "http://127.0.0.1:8545/",
       "blockExplorerUrl": "https://goerli.etherscan.io/",
       "iconUrl": "network/Network=Testnet",
       "chainColor": "#939BA1",

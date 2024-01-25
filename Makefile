@@ -636,7 +636,7 @@ endif
 
 	echo -e $(BUILD_MSG) "AppImage"
 
-	linuxdeployqt tmp/linux/dist/nim-status.desktop -no-copy-copyright-files -qmldir=ui -qmlimport=$(QT5_QMLDIR) -bundle-non-qt-libs
+	linuxdeployqt tmp/linux/dist/nim-status.desktop -no-copy-copyright-files -qmldir=ui -qmlimport=$(QT5_QMLDIR) -bundle-non-qt-libs -exclude-libs=libgmodule-2.0.so.0,libgthread-2.0.so.0
 ifdef IN_NIX_SHELL
 	patchelf --set-interpreter /lib64/ld-linux-x86-64.so.2 tmp/linux/dist/usr/bin/nim_status_client
 endif

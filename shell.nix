@@ -53,6 +53,8 @@ in pkgs.mkShell {
     export PATH="${pkgs.lddWrapped}/bin:$PATH"
   '';
 
+  LIBKRB5_PATH = pkgs.libkrb5 + "/lib";
+
   # Used for linuxdeployqt
   # TODO:check which deps are needed
   LD_LIBRARY_PATH = with pkgs; lib.makeLibraryPath (

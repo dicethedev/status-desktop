@@ -622,6 +622,9 @@ $(STATUS_CLIENT_APPIMAGE): nim_status_client $(APPIMAGE_TOOL) nim-status.desktop
 	cp bin/i18n/* tmp/linux/dist/usr/i18n
 	mkdir -p tmp/linux/dist/usr/bin/StatusQ
 	cp bin/StatusQ/* tmp/linux/dist/usr/bin/StatusQ
+ifdef IN_NIX_SHELL
+	patchelf --set-rpath '$$ORIGIN/../../lib' tmp/linux/dist/usr/bin/StatusQ/libStatusQ.so
+endif
 
 	# Libraries
 ifndef IN_NIX_SHELL
@@ -646,6 +649,9 @@ endif
 
 	# Qt plugins
 	cp $(FCITX5_QT) tmp/linux/dist/usr/plugins/platforminputcontexts/
+ifdef IN_NIX_SHELL
+	patchelf --set-rpath '$$ORIGIN/../../lib' tmp/linux/dist/usr/plugins/platforminputcontexts/libfcitx5platforminputcontextplugin.so
+endif
 
 	rm tmp/linux/dist/AppRun
 	cp AppRun tmp/linux/dist/.

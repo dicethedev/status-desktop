@@ -53,7 +53,8 @@ in pkgs.mkShell {
     export PATH="${pkgs.lddWrapped}/bin:$PATH"
   '';
 
-  LIBKRB5_PATH = pkgs.libkrb5 + "/lib";
+  LIBKRB5_PATH = pkgs.libkrb5;
+  QTWEBENGINE_PATH = pkgs.qt515.qtwebengine.out;
 
   # Used for linuxdeployqt
   # TODO:check which deps are needed

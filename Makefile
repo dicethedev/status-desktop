@@ -643,6 +643,7 @@ endif
 ifdef IN_NIX_SHELL
 	cp $$LIBKRB5_PATH/lib/libcom_err.so.3 tmp/linux/dist/usr/lib/libcom_err.so.3
 	cp $$QTWEBENGINE_PATH/libexec/QtWebEngineProcess tmp/linux/dist/usr/libexec/QtWebEngineProcess
+	patchelf --set-rpath '$$ORIGIN/../lib' tmp/linux/dist/usr/libexec/QtWebEngineProcess
 	cp $$QTWEBENGINE_PATH/resources/* tmp/linux/dist/usr/resources/
 	patchelf --set-interpreter /lib64/ld-linux-x86-64.so.2 tmp/linux/dist/usr/bin/nim_status_client
 endif

@@ -55,6 +55,7 @@ in pkgs.mkShell {
 
   LIBKRB5_PATH = pkgs.libkrb5;
   QTWEBENGINE_PATH = pkgs.qt515.qtwebengine.out;
+  GSTREAMER_PATH = pkgs.gst_all_1.gstreamer;
 
   # Used for linuxdeployqt
   # TODO:check which deps are needed

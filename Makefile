@@ -627,7 +627,24 @@ ifdef IN_NIX_SHELL
 endif
 
 	# Libraries
-ifndef IN_NIX_SHELL
+ifdef IN_NIX_SHELL
+	mkdir -p tmp/linux/dist/usr/lib/{gstreamer1.0,gstreamer-1.0}
+	mkdir -p tmp/linux/dist/usr/{libexec,resources}
+
+	echo $$GST_PLUGIN_SYSTEM_PATH_1_0 | tr ':' '\n' | sort -u | xargs -I {} find {} -name "*.so" | xargs -I {} cp {} tmp/linux/dist/usr/lib/gstreamer-1.0/
+	chmod u+w tmp/linux/dist/usr/lib/gstreamer-1.0/*
+
+	cp -r $$GSTREAMER_PATH/libexec/gstreamer-1.0 tmp/linux/dist/usr/lib/gstreamer1.0/
+	chmod u+w tmp/linux/dist/usr/lib/gstreamer1.0/gstreamer-1.0/*
+
+	cp $$LIBKRB5_PATH/lib/libcom_err.so.3 tmp/linux/dist/usr/lib/libcom_err.so.3
+	chmod u+w tmp/linux/dist/usr/lib/libcom_err.so.3
+
+	cp $$QTWEBENGINE_PATH/libexec/QtWebEngineProcess tmp/linux/dist/usr/libexec/QtWebEngineProcess
+	chmod u+w tmp/linux/dist/usr/libexec/QtWebEngineProcess
+
+	cp $$QTWEBENGINE_PATH/resources/* tmp/linux/dist/usr/resources/
+else
 	cp -r /usr/lib/x86_64-linux-gnu/nss tmp/linux/dist/usr/lib/
 	cp -P /usr/lib/x86_64-linux-gnu/libgst* tmp/linux/dist/usr/lib/
 	cp -r /usr/lib/x86_64-linux-gnu/gstreamer-1.0 tmp/linux/dist/usr/lib/
@@ -640,21 +657,18 @@ endif
 	echo -e $(BUILD_MSG) "AppImage"
 
 	linuxdeployqt tmp/linux/dist/nim-status.desktop -no-copy-copyright-files -qmldir=ui -qmlimport=$(QT5_QMLDIR) -bundle-non-qt-libs -exclude-libs=libgmodule-2.0.so.0,libgthread-2.0.so.0
+
 ifdef IN_NIX_SHELL
-	cp $$LIBKRB5_PATH/lib/libcom_err.so.3 tmp/linux/dist/usr/lib/libcom_err.so.3
-
-	cp $$QTWEBENGINE_PATH/libexec/QtWebEngineProcess tmp/linux/dist/usr/libexec/QtWebEngineProcess
-	chmod u+w tmp/linux/dist/usr/libexec/QtWebEngineProcess
+	patchelf --set-rpath '$$ORIGIN/../../' tmp/linux/dist/usr/lib/gstreamer1.0/gstreamer-1.0/*
+	patchelf --set-rpath '$$ORIGIN' tmp/linux/dist/usr/lib/libcom_err.so.3
 	patchelf --set-rpath '$$ORIGIN/../lib' tmp/linux/dist/usr/libexec/QtWebEngineProcess
-
-	cp $$QTWEBENGINE_PATH/resources/* tmp/linux/dist/usr/resources/
+	patchelf --set-rpath '$$ORIGIN' tmp/linux/dist/usr/lib/libstatus.so
+	patchelf --set-rpath '$$ORIGIN/../' tmp/linux/dist/usr/lib/gstreamer-1.0/*
 
 	patchelf --set-interpreter /lib64/ld-linux-x86-64.so.2 tmp/linux/dist/usr/bin/nim_status_client
-
-	mkdir -p tmp/linux/dist/usr/lib/gstreamer-1.0
-	echo $$GST_PLUGIN_SYSTEM_PATH_1_0 | tr ':' '\n' | sort -u | xargs -I {} find {} -name "*.so" | xargs -I {} cp {} tmp/linux/dist/usr/lib/gstreamer-1.0/
-	find tmp/linux/dist/usr/lib/gstreamer-1.0/ -name "*.so" | xargs -I {} chmod u+w {}
-	find tmp/linux/dist/usr/lib/gstreamer-1.0/ -name "*.so" | xargs -I {} patchelf --set-rpath '$$ORIGIN/../' {}
+	patchelf --set-interpreter /lib64/ld-linux-x86-64.so.2 tmp/linux/dist/usr/libexec/QtWebEngineProcess
+	patchelf --set-interpreter /lib64/ld-linux-x86-64.so.2 tmp/linux/dist/usr/lib/libQt5Core.so.5
+	patchelf --set-interpreter /lib64/ld-linux-x86-64.so.2 tmp/linux/dist/usr/lib/gstreamer1.0/gstreamer-1.0/*
 endif
 
 	# Qt plugins

@@ -56,6 +56,10 @@ in pkgs.mkShell {
   LIBKRB5_PATH = pkgs.libkrb5;
   QTWEBENGINE_PATH = pkgs.qt515.qtwebengine.out;
   GSTREAMER_PATH = pkgs.gst_all_1.gstreamer;
+  NSS_PATH = pkgs.nss;
+  #QT_INSTALL_LIBEXECS = "${pkgs.qt515.qtwebengine.out}/libexec";
+  #QT_INSTALL_DATA = "${pkgs.qt515.qtwebengine.out}/libexec";
+  #QT_INSTALL_TRANSLATIONS = "${pkgs.qt515.qtwebengine.out}/translations";
 
   # Used for linuxdeployqt
   # TODO:check which deps are needed

@@ -628,22 +628,22 @@ endif
 
 	# Libraries
 ifdef IN_NIX_SHELL
-	mkdir -p tmp/linux/dist/usr/lib/{gstreamer1.0,gstreamer-1.0}
-	mkdir -p tmp/linux/dist/usr/{libexec,resources}
+	mkdir -p tmp/linux/dist/usr/lib/{gstreamer1.0,gstreamer-1.0,nss}
+	mkdir -p tmp/linux/dist/usr/{libexec,resources,translations}
 
 	echo $$GST_PLUGIN_SYSTEM_PATH_1_0 | tr ':' '\n' | sort -u | xargs -I {} find {} -name "*.so" | xargs -I {} cp {} tmp/linux/dist/usr/lib/gstreamer-1.0/
-	chmod u+w tmp/linux/dist/usr/lib/gstreamer-1.0/*
-
 	cp -r $$GSTREAMER_PATH/libexec/gstreamer-1.0 tmp/linux/dist/usr/lib/gstreamer1.0/
-	chmod u+w tmp/linux/dist/usr/lib/gstreamer1.0/gstreamer-1.0/*
-
 	cp $$LIBKRB5_PATH/lib/libcom_err.so.3 tmp/linux/dist/usr/lib/libcom_err.so.3
-	chmod u+w tmp/linux/dist/usr/lib/libcom_err.so.3
-
+	cp $$NSS_PATH/lib/{libfreebl3,libfreeblpriv3,libnssckbi,libnssdbm3,libsoftokn3}.{chk,so} tmp/linux/dist/usr/lib/nss/ || true
 	cp $$QTWEBENGINE_PATH/libexec/QtWebEngineProcess tmp/linux/dist/usr/libexec/QtWebEngineProcess
-	chmod u+w tmp/linux/dist/usr/libexec/QtWebEngineProcess
-
 	cp $$QTWEBENGINE_PATH/resources/* tmp/linux/dist/usr/resources/
+	cp -r $$QTWEBENGINE_PATH/translations/qtwebengine_locales tmp/linux/dist/usr/translations/
+
+	chmod u+w tmp/linux/dist/usr/lib/*
+	chmod u+w tmp/linux/dist/usr/lib/nss/*
+	chmod u+w tmp/linux/dist/usr/libexec/QtWebEngineProcess
+	chmod u+w tmp/linux/dist/usr/lib/gstreamer-1.0/*
+	chmod u+w tmp/linux/dist/usr/lib/gstreamer1.0/gstreamer-1.0/*
 else
 	cp -r /usr/lib/x86_64-linux-gnu/nss tmp/linux/dist/usr/lib/
 	cp -P /usr/lib/x86_64-linux-gnu/libgst* tmp/linux/dist/usr/lib/
@@ -656,7 +656,7 @@ endif
 
 	echo -e $(BUILD_MSG) "AppImage"
 
-	linuxdeployqt tmp/linux/dist/nim-status.desktop -no-copy-copyright-files -qmldir=ui -qmlimport=$(QT5_QMLDIR) -bundle-non-qt-libs -exclude-libs=libgmodule-2.0.so.0,libgthread-2.0.so.0
+	linuxdeployqt tmp/linux/dist/nim-status.desktop -no-copy-copyright-files -qmldir=ui -qmlimport=$(QT5_QMLDIR) -bundle-non-qt-libs -exclude-libs=libgmodule-2.0.so.0,libgthread-2.0.so.0 -verbose=1
 
 ifdef IN_NIX_SHELL
 	patchelf --set-rpath '$$ORIGIN/../../' tmp/linux/dist/usr/lib/gstreamer1.0/gstreamer-1.0/*
@@ -664,6 +664,7 @@ ifdef IN_NIX_SHELL
 	patchelf --set-rpath '$$ORIGIN/../lib' tmp/linux/dist/usr/libexec/QtWebEngineProcess
 	patchelf --set-rpath '$$ORIGIN' tmp/linux/dist/usr/lib/libstatus.so
 	patchelf --set-rpath '$$ORIGIN/../' tmp/linux/dist/usr/lib/gstreamer-1.0/*
+	patchelf --set-rpath '$$ORIGIN/../' tmp/linux/dist/usr/lib/nss/*.so
 
 	patchelf --set-interpreter /lib64/ld-linux-x86-64.so.2 tmp/linux/dist/usr/bin/nim_status_client
 	patchelf --set-interpreter /lib64/ld-linux-x86-64.so.2 tmp/linux/dist/usr/libexec/QtWebEngineProcess

@@ -88,6 +88,9 @@ in pkgs.mkShell {
     xcbutilwm
   ]) ++ (with gst_all_1; [
     gst-plugins-base
+    gst-plugins-good
+    gst-plugins-bad
+    gst-plugins-ugly
     gstreamer
   ]));
 }

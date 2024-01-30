@@ -650,6 +650,11 @@ ifdef IN_NIX_SHELL
 	cp $$QTWEBENGINE_PATH/resources/* tmp/linux/dist/usr/resources/
 
 	patchelf --set-interpreter /lib64/ld-linux-x86-64.so.2 tmp/linux/dist/usr/bin/nim_status_client
+
+	mkdir -p tmp/linux/dist/usr/lib/gstreamer-1.0
+	echo $$GST_PLUGIN_SYSTEM_PATH_1_0 | tr ':' '\n' | sort -u | xargs -I {} find {} -name "*.so" | xargs -I {} cp {} tmp/linux/dist/usr/lib/gstreamer-1.0/
+	find tmp/linux/dist/usr/lib/gstreamer-1.0/ -name "*.so" | xargs -I {} chmod u+w {}
+	find tmp/linux/dist/usr/lib/gstreamer-1.0/ -name "*.so" | xargs -I {} patchelf --set-rpath '$$ORIGIN/../' {}
 endif
 
 	# Qt plugins

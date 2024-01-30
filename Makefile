@@ -606,6 +606,7 @@ PRODUCTION_PARAMETERS := -d:production
 $(STATUS_CLIENT_APPIMAGE): override RESOURCES_LAYOUT := $(PRODUCTION_PARAMETERS)
 $(STATUS_CLIENT_APPIMAGE): nim_status_client $(APPIMAGE_TOOL) nim-status.desktop $(FCITX5_QT)
 	rm -rf pkg/*.AppImage
+	chmod -R u+w tmp
 	rm -rf tmp/linux/dist
 	mkdir -p tmp/linux/dist/usr/bin
 	mkdir -p tmp/linux/dist/usr/lib

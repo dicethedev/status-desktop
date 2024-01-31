@@ -47,19 +47,19 @@ in pkgs.mkShell {
   QTDIR = qtCustom;
   # TODO: still needed?
   # https://github.com/NixOS/nixpkgs/pull/109649
-  QT_INSTALL_PLUGINS = "${qtCustom}/${pkgs.qt515.qtbase.qtPluginPrefix}";
+  QT_INSTALL_PLUGINS = "${qtCustom}/${pkgs.qt515_8.qtbase.qtPluginPrefix}";
 
   shellHook = ''
     export PATH="${pkgs.lddWrapped}/bin:$PATH"
   '';
 
   LIBKRB5_PATH = pkgs.libkrb5;
-  QTWEBENGINE_PATH = pkgs.qt515.qtwebengine.out;
+  QTWEBENGINE_PATH = pkgs.qt515_8.qtwebengine.out;
   GSTREAMER_PATH = pkgs.gst_all_1.gstreamer;
   NSS_PATH = pkgs.nss;
-  #QT_INSTALL_LIBEXECS = "${pkgs.qt515.qtwebengine.out}/libexec";
-  #QT_INSTALL_DATA = "${pkgs.qt515.qtwebengine.out}/libexec";
-  #QT_INSTALL_TRANSLATIONS = "${pkgs.qt515.qtwebengine.out}/translations";
+  #QT_INSTALL_LIBEXECS = "${pkgs.qt515_8.qtwebengine.out}/libexec";
+  #QT_INSTALL_DATA = "${pkgs.qt515_8.qtwebengine.out}/libexec";
+  #QT_INSTALL_TRANSLATIONS = "${pkgs.qt515_8.qtwebengine.out}/translations";
 
   # Used for linuxdeployqt
   # TODO:check which deps are needed

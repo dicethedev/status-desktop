@@ -606,7 +606,7 @@ PRODUCTION_PARAMETERS := -d:production
 $(STATUS_CLIENT_APPIMAGE): override RESOURCES_LAYOUT := $(PRODUCTION_PARAMETERS)
 $(STATUS_CLIENT_APPIMAGE): nim_status_client $(APPIMAGE_TOOL) nim-status.desktop $(FCITX5_QT)
 	rm -rf pkg/*.AppImage
-	chmod -R u+w tmp
+	chmod -R u+w tmp || true
 	rm -rf tmp/linux/dist
 	mkdir -p tmp/linux/dist/usr/bin
 	mkdir -p tmp/linux/dist/usr/lib
@@ -640,11 +640,7 @@ ifdef IN_NIX_SHELL
 	cp $$QTWEBENGINE_PATH/resources/* tmp/linux/dist/usr/resources/
 	cp -r $$QTWEBENGINE_PATH/translations/qtwebengine_locales tmp/linux/dist/usr/translations/
 
-	chmod u+w tmp/linux/dist/usr/lib/*
-	chmod u+w tmp/linux/dist/usr/lib/nss/*
-	chmod u+w tmp/linux/dist/usr/libexec/QtWebEngineProcess
-	chmod u+w tmp/linux/dist/usr/lib/gstreamer-1.0/*
-	chmod u+w tmp/linux/dist/usr/lib/gstreamer1.0/gstreamer-1.0/*
+	chmod -R u+w tmp/linux/dist/usr
 else
 	cp -r /usr/lib/x86_64-linux-gnu/nss tmp/linux/dist/usr/lib/
 	cp -P /usr/lib/x86_64-linux-gnu/libgst* tmp/linux/dist/usr/lib/
@@ -657,7 +653,7 @@ endif
 
 	echo -e $(BUILD_MSG) "AppImage"
 
-	linuxdeployqt tmp/linux/dist/nim-status.desktop -no-copy-copyright-files -qmldir=ui -qmlimport=$(QT5_QMLDIR) -bundle-non-qt-libs -exclude-libs=libgmodule-2.0.so.0,libgthread-2.0.so.0 -verbose=1
+	linuxdeployqt tmp/linux/dist/nim-status.desktop -no-copy-copyright-files -qmldir=ui -qmlimport=$(QT5_QMLDIR) -bundle-non-qt-libs -exclude-libs=libgmodule-2.0.so.0,libgthread-2.0.so.0 -verbose=1 -executable=tmp/linux/dist/usr/libexec/QtWebEngineProcess
 
 ifdef IN_NIX_SHELL
 	patchelf --set-rpath '$$ORIGIN/../../' tmp/linux/dist/usr/lib/gstreamer1.0/gstreamer-1.0/*

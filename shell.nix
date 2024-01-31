@@ -78,7 +78,7 @@ in pkgs.mkShell {
     libpng
     libpulseaudio
     libxkbcommon
-    openexer
+    openexr
     p11-kit
     zlib
   ] ++ (with xorg; [

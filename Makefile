@@ -636,11 +636,16 @@ ifdef IN_NIX_SHELL
 	cp -r $$GSTREAMER_PATH/libexec/gstreamer-1.0 tmp/linux/dist/usr/lib/gstreamer1.0/
 	cp $$LIBKRB5_PATH/lib/libcom_err.so.3 tmp/linux/dist/usr/lib/libcom_err.so.3
 	cp $$NSS_PATH/lib/{libfreebl3,libfreeblpriv3,libnssckbi,libnssdbm3,libsoftokn3}.{chk,so} tmp/linux/dist/usr/lib/nss/ || true
+
 	cp $$QTWEBENGINE_PATH/libexec/QtWebEngineProcess tmp/linux/dist/usr/libexec/QtWebEngineProcess
+
 	#cp $$QTWEBENGINE_PATH/resources/* tmp/linux/dist/usr/resources/
 	cp $$QTWEBENGINE_PATH/resources/* tmp/linux/dist/usr/bin/
+	cp $$QTWEBENGINE_PATH/resources/* tmp/linux/dist/usr/libexec/
+
 	#cp -r $$QTWEBENGINE_PATH/translations/qtwebengine_locales tmp/linux/dist/usr/translations/
 	cp -r $$QTWEBENGINE_PATH/translations/qtwebengine_locales tmp/linux/dist/usr/bin/
+	cp -r $$QTWEBENGINE_PATH/translations/qtwebengine_locales tmp/linux/dist/usr/libexec/
 
 	chmod -R u+w tmp/linux/dist/usr
 else

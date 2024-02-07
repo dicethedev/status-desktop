@@ -46,6 +46,7 @@ MouseArea {
 
             MouseArea {
                 id: closeSensor
+                objectName: toolbarCloseButton
                 anchors.fill: parent
 
                 onClicked: statusMacWindowButtons.close()

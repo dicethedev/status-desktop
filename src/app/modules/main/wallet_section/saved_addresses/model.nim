@@ -9,7 +9,6 @@ type
   ModelRole {.pure.} = enum
     Name = UserRole + 1,
     Address
-    MixedcaseAddress
     Ens
     ColorId
     ChainShortNames
@@ -52,7 +51,6 @@ QtObject:
     {
       ModelRole.Name.int:"name",
       ModelRole.Address.int:"address",
-      ModelRole.MixedcaseAddress.int:"mixedcaseAddress",
       ModelRole.Ens.int:"ens",
       ModelRole.ColorId.int:"colorId",
       ModelRole.ChainShortNames.int:"chainShortNames",
@@ -74,8 +72,6 @@ QtObject:
       result = newQVariant(item.getName())
     of ModelRole.Address:
       result = newQVariant(item.getAddress())
-    of ModelRole.MixedcaseAddress:
-      result = newQVariant(item.getMixedcaseAddress())
     of ModelRole.Ens:
       result = newQVariant(item.getEns())
     of ModelRole.ColorId:

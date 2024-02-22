@@ -6,7 +6,6 @@ type
   Item* = object
     name: string
     address: string
-    mixedcaseAddress: string
     ens: string
     colorId: string
     chainShortNames: string
@@ -15,7 +14,6 @@ type
 proc initItem*(
   name: string,
   address: string,
-  mixedcaseAddress: string,
   ens: string,
   colorId: string,
   chainShortNames: string,
@@ -23,7 +21,6 @@ proc initItem*(
 ): Item =
   result.name = name
   result.address = address
-  result.mixedcaseAddress = mixedcaseAddress
   result.ens = ens
   result.colorId = colorId
   result.chainShortNames = chainShortNames
@@ -33,7 +30,6 @@ proc `$`*(self: Item): string =
   result = fmt"""SavedAddressItem(
     name: {self.name},
     address: {self.address},
-    mixedcaseAddress: {self.mixedcaseAddress},
     ens: {self.ens},
     colorId: {self.colorId},
     chainShortNames: {self.chainShortNames},
@@ -51,9 +47,6 @@ proc getEns*(self: Item): string =
 
 proc getAddress*(self: Item): string =
   return self.address
-
-proc getMixedcaseAddress*(self: Item): string =
-  return self.mixedcaseAddress
 
 proc getColorId*(self: Item): string =
   return self.colorId

@@ -10,7 +10,7 @@ import utils 1.0
 Input {
     id: root
 
-    property int maximumLength: 10
+    property int maximumLength: 10 + tokenDecimals
     property var locale: Qt.locale()
 
     readonly property alias amount: d.amount
@@ -18,6 +18,7 @@ Input {
 
     readonly property bool valid: validationError.length === 0
     property bool allowDecimals: true
+    property int tokenDecimals: 0
 
     property bool validateMaximumAmount: false
     property string maximumAmount: "0"
@@ -84,6 +85,13 @@ Input {
                 return
             }
 
+            const fractionalPartLength = LocaleUtils.fractionalPartLength(amountNumber)
+            if (fractionalPartLength > root.tokenDecimals) {
+                d.amount = "0"
+                root.validationError = qsTr("The maximum number of decimals is %1").arg(root.tokenDecimals)
+                return
+            }
+
             if (!root.allowZero && amountNumber === 0) {
                 d.amount = "0"
                 root.validationError = qsTr("Amount must be greater than 0")
@@ -100,7 +108,7 @@ Input {
                 const maxExceeded = SQUtils.AmountsArithmetic.cmp(
                                       amount, maximumAmount) === 1
 
-                if (SQUtils.AmountsArithmetic.cmp(amount, maximumAmount) === 1) {
+                if (maxExceeded) {
                     root.validationError = root.maximumExceededErrorText
                     return
                 }
@@ -110,7 +118,7 @@ Input {
             // As a target amount should be always integer number
             if (!Number.isInteger(amountNumber) && d.multiplierIndex === 0) {
                 d.amount = amount.toString()
-             } else {
+            } else {
                 d.amount = amount.toFixed(0)
             }
 

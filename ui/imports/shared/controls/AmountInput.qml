@@ -10,7 +10,7 @@ import utils 1.0
 Input {
     id: root
 
-    property int maximumLength: 10 + tokenDecimals
+    property int maximumLength: 0
     property var locale: Qt.locale()
 
     readonly property alias amount: d.amount
@@ -73,7 +73,7 @@ Input {
                 return
             }
 
-            if (d.getEffectiveDigitsCount(text) > root.maximumLength) {
+            if (maximumLength > 0 && d.getEffectiveDigitsCount(text) > root.maximumLength) {
                 root.validationError = qsTr("The maximum number of characters is %1").arg(root.maximumLength)
                 return
             }
@@ -88,7 +88,7 @@ Input {
             const fractionalPartLength = LocaleUtils.fractionalPartLength(amountNumber)
             if (fractionalPartLength > root.tokenDecimals) {
                 d.amount = "0"
-                root.validationError = qsTr("The maximum number of decimals is %1").arg(root.tokenDecimals)
+                root.validationError = qsTr("Max. %1 decimal places for this asset").arg(root.tokenDecimals)
                 return
             }
 

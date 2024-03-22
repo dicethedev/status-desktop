@@ -1268,10 +1268,11 @@ QtObject {
         For15min = 1,
         For1hr = 2,
         For8hr = 3,
-        For1week = 4,
-        TillUnmuted = 5,
-        For1min = 6,
-        Unmuted = 7
+        For24hr = 4,
+        For1week = 5,
+        TillUnmuted = 6,
+        For1min = 7,
+        Unmuted = 8
     }
 
     enum LinkPreviewType {

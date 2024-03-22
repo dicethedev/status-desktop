@@ -32,8 +32,8 @@ StatusMenu {
     }
 
     StatusAction {
-        text: qsTr("For 7 days")
-        onTriggered: muteTriggered(Constants.MutingVariations.For1week)
+        text: qsTr("For 24 hours")
+        onTriggered: muteTriggered(Constants.MutingVariations.For24hr)
     }
 
     StatusAction {

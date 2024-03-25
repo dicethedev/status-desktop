@@ -10,7 +10,6 @@ import utils 1.0
 Input {
     id: root
 
-    property int maximumLength: 0
     property var locale: Qt.locale()
 
     readonly property alias amount: d.amount
@@ -73,11 +72,6 @@ Input {
                 return
             }
 
-            if (maximumLength > 0 && d.getEffectiveDigitsCount(text) > root.maximumLength) {
-                root.validationError = qsTr("The maximum number of characters is %1").arg(root.maximumLength)
-                return
-            }
-
             const amountNumber = LocaleUtils.numberFromLocaleString(root.text, root.locale)
             if (isNaN(amountNumber)) {
                 d.amount = "0"
@@ -101,7 +95,7 @@ Input {
             const amount = SQUtils.AmountsArithmetic.fromNumber(
                              amountNumber, d.multiplierIndex)
 
-            if (root.validateMaximumAmount) {
+            if (root.validateMaximumAmount && root.maximumAmount && root.maximumAmount.length > 0) {
                 const maximumAmount = SQUtils.AmountsArithmetic.fromString(
                                         root.maximumAmount)
 

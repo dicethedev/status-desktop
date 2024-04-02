@@ -85,6 +85,11 @@ QtObject:
         if self.detailedEntry.updateDataIfSameID(collectible):
           break
 
+  proc processGetCollectibleSocialsResponse(self: Controller, response: JsonNode) =
+    let res = fromJson(response, backend_collectibles.CollectibleSocialsMessage)
+    self.detailedEntry.updateDataIfSameID(res)
+    self.detailedEntryChanged()
+
   proc getDetailedCollectible*(self: Controller, chainId: int, contractAddress: string, tokenId: string) {.slot.} =
     self.setIsDetailedEntryLoading(true)
 
@@ -101,6 +106,7 @@ QtObject:
     self.detailedEntryChanged()
 
     let response = backend_collectibles.getCollectiblesByUniqueIDAsync(self.requestId, @[id], self.dataType)
+    discard backend_collectibles.fetchCollectibleSocialsAsync(self.requestId, id)
     if response.error != nil:
       self.setIsDetailedEntryLoading(false)
       error "error fetching collectible details: ", response.error
@@ -113,6 +119,10 @@ QtObject:
 
     self.eventsHandler.onCollectiblesDataUpdate(proc (jsonObj: JsonNode) =
       self.processCollectiblesDataUpdate(jsonObj)
+    )
+
+    self.eventsHandler.onGetCollectibleSocialsDone(proc (jsonObj: JsonNode) =
+      self.processGetCollectibleSocialsResponse(jsonObj)
     )
 
   proc newController*(

@@ -25,6 +25,7 @@ const eventCommunityCollectiblesReceived*: string = "wallet-collectibles-communi
 const eventCollectiblesDataUpdated*: string = "wallet-collectibles-data-updated"
 const eventOwnedCollectiblesFilteringDone*: string = "wallet-owned-collectibles-filtering-done"
 const eventGetCollectiblesDetailsDone*: string = "wallet-get-collectibles-details-done"
+const eventGetCollectiblesSocialsDone*: string = "wallet-get-collectible-socials-done"
 
 const invalidTimestamp*: int = -1
 
@@ -270,6 +271,10 @@ rpc(getCollectiblesByUniqueIDAsync, "wallet"):
   requestId: int32
   uniqueIds: seq[CollectibleUniqueID]
   dataType: CollectibleDataType
+
+rpc(fetchCollectibleSocialsAsync, "wallet"):
+  requestId: int32
+  uniqueId: CollectibleUniqueID
 
 rpc(refetchOwnedCollectibles, "wallet"):
   discard

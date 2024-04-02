@@ -30,6 +30,8 @@ QtObject:
       generatedId: string
       generatedCollectionId: string
       tokenType: TokenType
+      website: string
+      twitterHandle: string
 
   proc setup(self: CollectiblesEntry) =
     self.QObject.setup
@@ -58,7 +60,9 @@ QtObject:
       ownership:{self.ownership},
       generatedId:{self.generatedId},
       generatedCollectionId:{self.generatedCollectionId},
-      tokenType:{self.tokenType}
+      tokenType:{self.tokenType},
+      website:{self.website},
+      twitterHandle:{self.twitterHandle}
     )"""
 
   proc hasCollectibleData(self: CollectiblesEntry): bool =
@@ -330,6 +334,20 @@ QtObject:
     read = getSoulbound
     notify = soulboundChanged
 
+  proc websiteChanged*(self: CollectiblesEntry) {.signal.}
+  proc getWebsite*(self: CollectiblesEntry): string {.slot.} =
+   return self.website
+  QtProperty[string] website:
+    read = getWebsite
+    notify = websiteChanged
+
+  proc twitterHandleChanged*(self: CollectiblesEntry) {.signal.}
+  proc getTwitterHandle*(self: CollectiblesEntry): string {.slot.} =
+   return self.twitterHandle
+  QtProperty[string] twitterHandle:
+    read = getTwitterHandle
+    notify = twitterHandleChanged
+
   proc updateDataIfSameID*(self: CollectiblesEntry, update: backend.Collectible): bool =
     if self.id != update.id:
       return false
@@ -371,6 +389,8 @@ QtObject:
     result.generatedId = result.id.toString()
     result.generatedCollectionId = result.id.contractID.toString()
     result.tokenType = contractTypeToTokenType(data.contractType.get())
+    result.website = data.collectionData.get().socials.website
+    result.twitterHandle = data.collectionData.get().socials.twitterHandle
     result.setup()
 
   proc newCollectibleDetailsBasicEntry*(id: backend.CollectibleUniqueID, extradata: ExtraData): CollectiblesEntry =
@@ -393,3 +413,14 @@ QtObject:
     )
     let extradata = ExtraData()
     return newCollectibleDetailsBasicEntry(id, extradata)
+
+  proc updateDataIfSameID*(self: CollectiblesEntry, update: backend.CollectibleSocialsMessage) =
+    if self.id != update.id:
+      return
+
+    self.website = update.socials.website
+    self.twitterHandle = update.socials.twitterHandle
+
+    # Notify changes for all properties
+    self.twitterHandleChanged()
+    self.websiteChanged()

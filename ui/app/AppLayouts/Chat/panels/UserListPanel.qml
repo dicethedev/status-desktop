@@ -89,7 +89,7 @@ Item {
                 userName: ProfileUtils.displayName("", model.ensName, model.displayName, model.alias)
                 pubKey: model.isEnsVerified ? "" : Utils.getCompressedPk(model.pubKey)
                 isContact: model.isContact
-                isVerified: model.isVerified
+                isVerified: model.isVerified && !rootStore.isCurrentUser(model.pubKey)
                 isUntrustworthy: model.isUntrustworthy
                 isAdmin: model.memberRole === Constants.memberRole.owner
                 asset.name: model.icon

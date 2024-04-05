@@ -57,6 +57,7 @@ QtObject {
         Global.openChooseBrowserPopup.connect(openChooseBrowserPopup)
         Global.openDownloadModalRequested.connect(openDownloadModal)
         Global.openImagePopup.connect(openImagePopup)
+        Global.openVideoPopup.connect(openVideoPopup)
         Global.openProfilePopupRequested.connect(openProfilePopup)
         Global.openNicknamePopupRequested.connect(openNicknamePopup)
         Global.markAsUntrustedRequested.connect(openMarkAsUntrustedPopup)
@@ -129,8 +130,12 @@ QtObject {
         openPopup(downloadPageComponent, popupProperties)
     }
 
-    function openImagePopup(image, url) {
-        openPopup(imagePopupComponent, {image: image, url: url})
+    function openImagePopup(image, url, plain) {
+        openPopup(imagePopupComponent, {image: image, url: url, plain: plain})
+    }
+
+    function openVideoPopup(url) {
+        openPopup(videoPopupComponent, { url: url })
     }
 
     function openProfilePopup(publicKey: string, parentPopup, cb) {
@@ -525,6 +530,14 @@ QtObject {
             id: imagePopupComponent
             StatusImageModal {
                 id: imagePopup
+                onClosed: destroy()
+            }
+        },
+
+        Component {
+            id: videoPopupComponent
+            StatusVideoModal {
+                id: videoPopup
                 onClosed: destroy()
             }
         },

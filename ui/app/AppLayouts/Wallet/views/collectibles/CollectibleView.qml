@@ -117,7 +117,7 @@ Control {
 
             visible: root.isCommunityCollectible && root.isPrivilegedToken
             size: PrivilegedTokenArtworkPanel.Size.Medium
-            artwork: root.fallbackImageUrl
+            artwork: visible ? root.fallbackImageUrl : ""
             color: root.ornamentColor
             isOwner: root.privilegesLevel === Constants.TokenPrivilegesLevel.Owner
 

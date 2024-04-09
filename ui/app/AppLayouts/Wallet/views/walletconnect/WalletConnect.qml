@@ -23,7 +23,8 @@ Item {
 
         projectId: controller.projectId
 
-        active: false
+        active: WalletStores.RootStore.walletSectionInst.walletReady && (controller.hasActivePairings || modal.opened)
+        //active: false
 
         onSessionRequestEvent: (details) => {
             modal.openWithSessionRequestEvent(details)

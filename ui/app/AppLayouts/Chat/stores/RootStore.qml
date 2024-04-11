@@ -696,6 +696,6 @@ QtObject {
     }
 
     function updatePermissionsModel(communityId, sharedAddresses) {
-        communitiesModuleInst.checkPermissions(communityId, JSON.stringify(sharedAddresses))
+        communitiesModuleInst.checkPermissions(communityId, JSON.stringify(sharedAddresses), false)
     }
 }

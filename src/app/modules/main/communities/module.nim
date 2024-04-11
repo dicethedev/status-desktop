@@ -863,13 +863,15 @@ method joinCommunityOrEditSharedAddresses*(self: Module) =
 method getCommunityPublicKeyFromPrivateKey*(self: Module, communityPrivateKey: string): string =
   result = self.controller.getCommunityPublicKeyFromPrivateKey(communityPrivateKey)
 
-method checkPermissions*(self: Module, communityId: string, sharedAddresses: seq[string]) =
+method checkPermissions*(self: Module, communityId: string, sharedAddresses: seq[string], temporary: bool) =
   self.joiningCommunityDetails.communityIdForPermissions = communityId
 
-  self.controller.asyncCheckPermissionsToJoin(communityId, sharedAddresses)
+  let requestId = if temporary: CommunityPermissionsCheckRequestID.SharedAddressesCheck else: CommunityPermissionsCheckRequestID.GeneralCommunity
+
+  self.controller.asyncCheckPermissionsToJoin(communityId, sharedAddresses, requestId)
   self.checkingPermissionToJoinInProgress = true
 
-  self.controller.asyncCheckAllChannelsPermissions(communityId, sharedAddresses)
+  self.controller.asyncCheckAllChannelsPermissions(communityId, sharedAddresses, requestId)
   self.checkingAllChannelPermissionsInProgress = true
 
   self.view.setCheckingPermissionsInProgress(inProgress = true)
@@ -887,7 +889,7 @@ method prepareTokenModelForCommunity*(self: Module, communityId: string) =
     tokenPermissionsItems.add(tokenPermissionItem)
 
   self.view.spectatedCommunityPermissionModel.setItems(tokenPermissionsItems)
-  self.checkPermissions(communityId, @[])
+  self.checkPermissions(communityId, @[], false)
 
 proc applyPermissionResponse*(self: Module, communityId: string, permissions: Table[string, CheckPermissionsResultDto]) =
   let community = self.controller.getCommunityById(communityId)
